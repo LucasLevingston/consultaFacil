@@ -1,4 +1,4 @@
-"use server";
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -7,15 +7,26 @@ import { columns } from "@/components/table/columns";
 import { DataTable } from "@/components/table/DataTable";
 import { getRecentAppointmentsByDoctorId } from "@/lib/actions/appointment.actions";
 import { useSession } from "next-auth/react";
+import { auth } from "@/app/api/auth/auth";
+import { getUserByEmail } from "@/lib/actions/user.actions";
+import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const AdminPage = async () => {
-  const { data } = useSession();
-
-  if (!data || !data.user || !data.user.id) {
-    return <p>Error: User not found. Please log in.</p>;
+  const route = useRouter();
+  const session = await auth();
+  console.log(session);
+  if (!session) {
+    route.push("/");
   }
 
-  const appointments = await getRecentAppointmentsByDoctorId(data.user.id);
+  const user = await getUserByEmail(session?.user?.email);
+
+  if (!user) {
+    redirect("/");
+  }
+
+  const appointments = await getRecentAppointmentsByDoctorId(user.id);
 
   if (!appointments) {
     return <p>Failed to load appointments. Please try again later.</p>;

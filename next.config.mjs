@@ -2,7 +2,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config) => {
-    config.externals = [...config.externals, "bcrypt"];
+    config.externals = [...config.externals];
     return config;
   },
 };

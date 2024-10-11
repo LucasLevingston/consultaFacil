@@ -1,4 +1,2 @@
-// "use server";
-
-// import handlers from "@/lib/auth"; // Referring to the auth.ts we just created
-// // export const { GET, POST } = handlers;
+import { handlers } from "@/app/api/auth/auth";
+export const { GET, POST } = handlers;

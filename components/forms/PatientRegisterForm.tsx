@@ -28,7 +28,10 @@ import SubmitButton from "../SubmitButton";
 import { User } from "@prisma/client";
 import { RegisterPatientParams } from "@/types";
 
-const PatientRegisterForm = ({ user }: { user: User }) => {
+interface PatientRegisterFormProps {
+  user: User;
+}
+const PatientRegisterForm: React.FC<PatientRegisterFormProps> = ({ user }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 

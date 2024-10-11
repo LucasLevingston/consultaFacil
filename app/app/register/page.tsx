@@ -4,14 +4,20 @@ import { redirect } from "next/navigation";
 import { getPatient, getUser } from "@/lib/actions/patient.actions";
 import { SearchParamProps } from "@/types";
 import DoctorRegisterForm from "@/components/forms/DoctorRegisterForm";
+import PatientRegisterForm from "@/components/forms/PatientRegisterForm";
+import { useSession } from "next-auth/react";
+import { auth } from "@/app/api/auth/auth";
+import { getUserByEmail } from "@/lib/actions/user.actions";
 
-const Register = async ({ params: { userId } }: SearchParamProps) => {
-  const user = await getUser(userId);
+const Register = async () => {
+  const session = await auth();
 
+  const user = await getUserByEmail(session?.user?.email);
   if (!user) {
     redirect("/");
   }
-  if (user?.isDone) redirect(`/patients/${userId}/new-appointment`);
+
+  if (user?.isDone) redirect(`/new-appointment`);
 
   return (
     <div className="flex h-screen max-h-screen">
@@ -24,8 +30,11 @@ const Register = async ({ params: { userId } }: SearchParamProps) => {
             alt="patient"
             className="mb-12 h-10 w-fit"
           />
-
-          <DoctorRegisterForm user={user} />
+          {user && user.role === "doctor" ? (
+            <DoctorRegisterForm user={user} />
+          ) : (
+            <PatientRegisterForm user={user} />
+          )}
 
           <p className="copyright py-12">© 2024 CarePluse</p>
         </div>

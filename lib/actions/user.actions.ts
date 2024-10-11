@@ -1,13 +1,13 @@
 "use server";
 
-import { prisma } from "@/prisma";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { CreateUserParams } from "@/types";
 import { comparePassword, hashPassword } from "../utils";
-import { signIn } from "../auth";
-import { SignInResponse } from "next-auth/react";
+import { signIn, SignInResponse, signOut } from "next-auth/react";
+import { auth } from "@/app/api/auth/auth";
 
-const getUserByEmail = async (email: string) => {
+export const getUserByEmail = async (email: string) => {
   return await prisma.user.findUnique({
     where: { email },
   });
@@ -26,7 +26,7 @@ export async function createUser(user: CreateUserParams) {
     if (result?.error) {
       throw new Error(result.error);
     }
-    console.log("a");
+
     const newUser = await getUserByEmail(user.email);
     return newUser
       ? {
@@ -60,7 +60,7 @@ export const registerUser = async (formData: CreateUserParams) => {
   }
 };
 
-export const loginWithCreds = async (data: { email: string; password: string }) => {
+export const signInWithCreds = async (data: { email: string; password: string }) => {
   const existingUser = await getUserByEmail(data.email);
   if (!existingUser) {
     throw new Error("User not found.");
@@ -83,3 +83,17 @@ export const loginWithCreds = async (data: { email: string; password: string }) 
   revalidatePath("/");
   return { id: existingUser.id, isDone: existingUser.isDone, role: existingUser.role };
 };
+
+export const signInWithGoogle = async () => {
+  await signIn("google");
+};
+
+export const signout = async () => {
+  await signOut();
+};
+
+export async function getCurrentUser() {
+  const sesstion = await auth();
+  const user = await getUserByEmail(sesstion?.user?.email);
+  return user;
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -15,12 +15,25 @@ import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
 import { SelectItem } from "../ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { createUser, loginWithCreds, registerUser } from "@/lib/actions/user.actions";
+import {
+  createUser,
+  registerUser,
+  signInWithCreds,
+  signInWithGoogle,
+} from "@/lib/actions/user.actions";
 import router from "next/router";
+import { toast } from "@/hooks/use-toast";
+import { Button } from "../ui/button";
+import GoogleIcon from "../icons/GoogleIcon";
+import { auth } from "@/app/api/auth/auth";
 
-export const UserForm = () => {
+export const UserForm = async () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const session = await auth();
+  if (session) {
+    redirect("/");
+  }
 
   const registerForm = useForm<z.infer<typeof UserFormValidation>>({
     resolver: zodResolver(UserFormValidation),
@@ -43,28 +56,17 @@ export const UserForm = () => {
 
   const onRegisterSubmit = async (values: z.infer<typeof UserFormValidation>) => {
     setIsLoading(true);
+    const response = await fetch(`/api/auth/${values.role}/register`, {
+      method: "POST",
+      body: JSON.stringify(values),
+    });
+    const data = await response.json();
 
-    try {
-      const newUser = await createUser({
-        email: values.email,
-        phone: values.phone,
-        name: values.name,
-        password: values.password,
-        role: values.role,
-      });
+    toast({ title: "Account created!" });
 
-      if (!newUser) {
-        console.log("Error:", newUser);
-      }
-
-      if (newUser && values.role === "doctor") {
-        router.push(`/doctors/${newUser.id}/register`);
-      } else if (newUser && values.role === "patient") {
-        router.push(`/patients/${newUser.id}/register`);
-      }
-    } catch (error) {
-      console.error(error);
-    }
+    setTimeout(() => {
+      router.push(`/${values.role}/${data.id}/register`);
+    }, 1000);
 
     setIsLoading(false);
   };
@@ -72,27 +74,24 @@ export const UserForm = () => {
   const onLoginSubmit = async (values: z.infer<typeof LoginFormValidation>) => {
     setIsLoading(true);
 
-    try {
-      const result = await loginWithCreds({
-        email: values.email,
-        password: values.password,
-      });
+    const response = (await signInWithCreds({
+      email: values.email,
+      password: values.password,
+    })) as any;
 
-      if (!result) {
-        console.log("Error:", result);
-      } else {
-        if (!result.isDone && result.role === "patient") {
-          return router.push(`/patients/${result.id}/register`);
-        }
-        if (!result.isDone && result.role === "doctor") {
-          return router.push(`/doctors/${result.id}/register`);
-        }
-        router.push(`/patients/${result.id}/appointments`);
-      }
-    } catch (error) {
-      console.error("Error logging in:", error);
+    if (response?.error) {
+      toast({
+        variant: "destructive",
+        title: "Invalid credentials, please try again",
+      });
+      return;
     }
 
+    if (!response?.error) {
+      router.push(`/app/${response.role}`);
+    }
+
+    toast({ title: "You are now signed in!" });
     setIsLoading(false);
   };
 
@@ -169,7 +168,15 @@ export const UserForm = () => {
                 </div>
               </SelectItem>
             </CustomFormField>
-
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                signInWithGoogle();
+              }}
+              className="text-sm"
+            >
+              <GoogleIcon />
+            </Button>
             <SubmitButton isLoading={isLoading}>Registrar</SubmitButton>
           </form>
         </Form>

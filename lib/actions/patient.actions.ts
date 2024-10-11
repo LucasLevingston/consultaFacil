@@ -3,8 +3,8 @@
 import { ID, InputFile, Query } from "node-appwrite";
 import { BUCKET_ID, ENDPOINT, PROJECT_ID, storage } from "../appwrite.config";
 import { parseStringify } from "../utils";
-import { prisma } from "@/prisma";
-import { CreateUserParams, RegisterPatientParams } from "@/types";
+import { prisma } from "@/lib/prisma";
+import { RegisterPatientParams } from "@/types";
 
 // export const createPatient = async (patient: CreateUserParams) => {
 //   try {

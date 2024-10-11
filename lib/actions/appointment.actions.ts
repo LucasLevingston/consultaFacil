@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { formatDateTime, parseStringify } from "../utils";
 import { CreateAppointmentParams, UpdateAppointmentParams } from "@/types";
-import { prisma } from "@/db";
+import { prisma } from "@/lib/prisma";
 
 export const createAppointment = async (appointment: CreateAppointmentParams) => {
   try {

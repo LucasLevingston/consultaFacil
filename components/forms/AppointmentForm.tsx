@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
 import { redirect, useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -17,9 +16,12 @@ import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
 import { Form } from "../ui/form";
 import { getAllDoctors } from "@/lib/actions/doctor.actions";
-import { Appointment, DoctorDetails, Status } from "@prisma/client";
+import { Appointment, DoctorDetails, Status, User } from "@prisma/client";
 import { CreateAppointmentParams, UpdateAppointmentParams } from "@/types";
+import { auth } from "@/app/api/auth/auth";
 import { useSession } from "next-auth/react";
+import { getCurrentUser, getUserByEmail } from "@/lib/actions/user.actions";
+import { type } from "os";
 
 export const AppointmentForm = ({
   type = "create",
@@ -30,15 +32,11 @@ export const AppointmentForm = ({
   appointment?: Appointment;
   setOpen?: Dispatch<SetStateAction<boolean>>;
 }) => {
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [doctors, setDoctors] = useState<DoctorDetails[]>([]);
-
-  const { data } = useSession();
-  const user = data?.user;
-  if (!user) {
-    throw new Error("User not logged");
-  }
+  const [patient, setPatient] = useState<User | null>();
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -48,7 +46,12 @@ export const AppointmentForm = ({
       }
       setDoctors(allDoctors);
     };
-
+    const fetchUser = async () => {
+      const user = await getCurrentUser();
+      setPatient(user);
+      console.log(user);
+    };
+    fetchUser();
     fetchDoctors();
   }, []);
 

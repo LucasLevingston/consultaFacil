@@ -1,16 +1,12 @@
-"use server";
-
-import { ID, InputFile } from "node-appwrite";
-import { BUCKET_ID, ENDPOINT, PROJECT_ID, storage } from "../appwrite.config";
+import { getUser } from "@/lib/actions/patient.actions";
+import { storage, BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/appwrite.config";
 import { prisma } from "@/lib/prisma";
-import { RegisterDoctorParams } from "@/types";
-import { getUser } from "./patient.actions";
+import { InputFile, ID } from "node-appwrite";
 
-export const registerDoctor = async ({
-  identificationDocument,
-  ...doctor
-}: RegisterDoctorParams) => {
+export async function POST(request: Request) {
   try {
+    const { doctor, identificationDocument } = await request.json();
+
     let file;
 
     if (identificationDocument) {
@@ -26,18 +22,15 @@ export const registerDoctor = async ({
       throw new Error("Error creating file.");
     }
 
-    // Fetch the existing user data
     const user = await getUser(doctor.userId);
     if (!user) {
       throw new Error("User not found.");
     }
 
-    // Check if DoctorDetails already exists
     const existingDoctorDetails = await prisma.doctorDetails.findUnique({
       where: { userId: doctor.userId },
     });
 
-    // Update user and doctor details accordingly
     const newDoctorRecord = await prisma.user.update({
       where: { id: doctor.userId },
       data: {
@@ -45,9 +38,9 @@ export const registerDoctor = async ({
         email: doctor.email || user.email,
         emailVerified: user.emailVerified,
         phone: doctor.phone || user.phone,
-        password: user.password, // Retain existing password
+        password: user.password,
         isDone: true,
-        role: "doctor", // Set role to doctor
+        role: "doctor",
         doctorDetails: existingDoctorDetails
           ? {
               update: {
@@ -79,27 +72,5 @@ export const registerDoctor = async ({
   } catch (error) {
     console.error("An error occurred while creating a new doctor record:", error);
     throw new Error("Failed to register doctor.");
-  }
-};
-
-export async function getDoctor(doctorId: string) {
-  try {
-    const doctor = await prisma.user.findUnique({
-      where: { id: doctorId },
-    });
-    return doctor;
-  } catch (error) {
-    console.error("An error occurred while retrieving the doctor details:", error);
-    throw error;
-  }
-}
-
-export async function getAllDoctors() {
-  try {
-    const doctors = await prisma.doctorDetails.findMany();
-    return doctors ? doctors : [];
-  } catch (error) {
-    console.error("An error occurred while retrieving the doctor details:", error);
-    throw error;
   }
 }

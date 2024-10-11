@@ -18,9 +18,11 @@ import { FileUploader } from "../FileUploader";
 import SubmitButton from "../SubmitButton";
 import { User } from "@prisma/client";
 import { RegisterDoctorParams } from "@/types";
-import { registerDoctor } from "@/lib/actions/doctor.actions";
-
-const DoctorRegisterForm = ({ user }: { user: User }) => {
+import { getDoctor, registerDoctor } from "@/lib/actions/doctor.actions";
+interface DoctorRegisterFormProps {
+  user: User;
+}
+const DoctorRegisterForm: React.FC<DoctorRegisterFormProps> = ({ user }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
