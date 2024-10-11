@@ -1,4 +1,4 @@
-import { Status } from "@prisma/client";
+import { Role, Status, User, PatientDetails, DoctorDetails } from "@prisma/client";
 
 declare type SearchParamProps = {
   params: { [key: string]: string };
@@ -13,10 +13,6 @@ declare interface CreateUserParams {
   phone: string;
   password: string;
   role: "doctor" | "patient" | "admin";
-}
-
-declare interface User extends CreateUserParams {
-  $id: string;
 }
 
 declare interface RegisterPatientParams extends CreateUserParams {
@@ -34,7 +30,7 @@ declare interface RegisterPatientParams extends CreateUserParams {
   familyMedicalHistory?: string; // Use optional instead of undefined
   pastMedicalHistory?: string; // Use optional instead of undefined
   identificationType?: string; // Use optional instead of undefined
-  identificationNumber?: string; // Use optional instead of undefined
+  cpf?: string; // Use optional instead of undefined
   identificationDocument?: FormData; // Use optional instead of undefined
   privacyConsent: boolean;
 }
@@ -66,9 +62,19 @@ export interface RegisterDoctorParams extends CreateUserParams {
   specialty?: string;
   licenseNumber?: string;
   identificationType: string;
-  identificationNumber: string;
+  cpf: string;
   identificationDocument?: FormData;
   privacyConsent: boolean;
   password: string;
   role: string;
+}
+
+export interface Doctor extends User {
+  role: "doctor";
+  doctorDetails: DoctorDetails;
+}
+
+export interface Patient extends User {
+  role: "patient";
+  patientDetails: PatientDetails;
 }

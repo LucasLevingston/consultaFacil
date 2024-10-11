@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import bcrypt from "bcryptjs";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -77,15 +78,10 @@ export function decryptKey(passkey: string) {
   return atob(passkey);
 }
 export async function hashPassword(password: string) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data); // Use SHA-256
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashedPassword = hashArray.map((b) => ("00" + b.toString(16)).slice(-2)).join("");
-  return hashedPassword;
+  const salt = await bcrypt.genSalt(10);
+  const hash = await bcrypt.hash(password, salt);
+  return hash;
 }
-
-export async function comparePassword(password: string, hashedPassword: string) {
-  const hashedInput = await hashPassword(password);
-  return hashedInput === hashedPassword; // Simple comparison
+export async function comparePassword(password: string, userPassword: string) {
+  return await bcrypt.compare(password, userPassword);
 }

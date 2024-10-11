@@ -7,19 +7,12 @@ import { CreateAppointmentParams, UpdateAppointmentParams } from "@/types";
 import { prisma } from "@/lib/prisma";
 
 export const createAppointment = async (appointment: CreateAppointmentParams) => {
-  try {
-    const newAppointment = await prisma.appointment.create({
-      data: appointment,
-    });
-
-    revalidatePath("/admin");
-    return newAppointment;
-  } catch (error) {
-    console.error("An error occurred while creating a new appointment:", error);
-  }
+  return await prisma.appointment.create({
+    data: appointment,
+  });
 };
 
-export const getRecentAppointmentList = async () => {
+export const getAppointments = async () => {
   try {
     const appointments = await prisma.appointment.findMany({
       orderBy: {
@@ -71,7 +64,6 @@ export const getRecentAppointmentList = async () => {
 //   }
 // };
 
-// UPDATE APPOINTMENT
 export const updateAppointment = async ({
   appointmentId,
   timeZone,
@@ -86,7 +78,7 @@ export const updateAppointment = async ({
 
     if (!updatedAppointment) throw new Error("Appointment not found");
 
-    const smsMessage = `Greetings from ConsultaFácil. ${type === "schedule" ? `Your appointment is confirmed for ${formatDateTime(appointment.schedule!, timeZone).dateTime} with Dr. ${appointment.primaryPhysician}` : `We regret to inform that your appointment for ${formatDateTime(appointment.schedule!, timeZone).dateTime} is cancelled. Reason: ${appointment.cancellationReason}.`}`;
+    // const smsMessage = `Greetings from ConsultaFácil. ${type === "schedule" ? `Your appointment is confirmed for ${formatDateTime(appointment.schedule!, timeZone).dateTime} with Dr. ${appointment.primaryPhysician}` : `We regret to inform that your appointment for ${formatDateTime(appointment.schedule!, timeZone).dateTime} is cancelled. Reason: ${appointment.cancellationReason}.`}`;
     // await sendSMSNotification(userId, smsMessage);
 
     revalidatePath("/admin");
@@ -96,23 +88,59 @@ export const updateAppointment = async ({
   }
 };
 
-// GET APPOINTMENT
 export const getAppointment = async (appointmentId: string) => {
-  try {
-    const appointment = await prisma.appointment.findUnique({
-      where: { id: appointmentId },
-    });
-
-    return parseStringify(appointment);
-  } catch (error) {
-    console.error("An error occurred while retrieving the appointment:", error);
-  }
+  return await prisma.appointment.findUnique({
+    where: { id: appointmentId },
+  });
 };
 
-export const getRecentAppointmentsByDoctorId = async (doctorId: string) => {
+export const getAppointmentsByDoctorId = async (doctorId: string) => {
   try {
     const appointments = await prisma.appointment.findMany({
       where: { doctorId },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const initialCounts = {
+      scheduledCount: 0,
+      pendingCount: 0,
+      cancelledCount: 0,
+    };
+
+    const counts = appointments.reduce((acc, appointment) => {
+      switch (appointment.status) {
+        case "confirmed":
+          acc.scheduledCount++;
+          break;
+        case "pending":
+          acc.pendingCount++;
+          break;
+        case "canceled":
+          acc.cancelledCount++;
+          break;
+      }
+      return acc;
+    }, initialCounts);
+
+    const data = {
+      totalCount: appointments.length,
+      ...counts,
+      documents: appointments,
+    };
+
+    return data;
+  } catch (error) {
+    console.error("An error occurred while creating a new appointment:", error);
+    throw new Error("Failed to create appointment");
+  }
+};
+
+export const getAppointmentsByPatientId = async (patientId: string) => {
+  try {
+    const appointments = await prisma.appointment.findMany({
+      where: { patientId },
       orderBy: {
         createdAt: "desc",
       },

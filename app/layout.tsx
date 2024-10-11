@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/providers/authprovider";
 import { Toaster } from "@/components/ui/toaster";
+import { Header } from "@/components/Header";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -37,6 +38,7 @@ export default function RootLayout({
           )}
         >
           <ThemeProvider attribute="class" defaultTheme="system">
+            <Header />
             {children}
             <Toaster />
           </ThemeProvider>

@@ -8,33 +8,50 @@ import { z } from "zod";
 
 import { Form, FormControl } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
-import { DoctorFormDefaultValues, IdentificationTypes } from "@/constants";
-import { DoctorFormValidation } from "@/lib/validation";
+import { IdentificationTypes } from "@/constants";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "react-phone-number-input/style.css";
-import CustomFormField, { FormFieldType } from "../CustomFormField";
-import { FileUploader } from "../FileUploader";
-import SubmitButton from "../SubmitButton";
-import { User } from "@prisma/client";
-import { RegisterDoctorParams } from "@/types";
-import { getDoctor, registerDoctor } from "@/lib/actions/doctor.actions";
-interface DoctorRegisterFormProps {
-  user: User;
-}
-const DoctorRegisterForm: React.FC<DoctorRegisterFormProps> = ({ user }) => {
+
+import { Doctor, RegisterDoctorParams } from "@/types";
+import { registerDoctor } from "@/lib/actions/doctor.actions";
+import CustomFormField, { FormFieldType } from "@/components/CustomFormField";
+import { FileUploader } from "@/components/FileUploader";
+import SubmitButton from "@/components/SubmitButton";
+import { DoctorFormDefaultValues } from "./DefaultValues";
+import { DoctorFormValidation } from "./FormValidation";
+
+const DoctorDetailsForm = ({ user }: { user: Doctor }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [defaultValues, setDefaultValues] = useState(DoctorFormDefaultValues);
 
   const form = useForm<z.infer<typeof DoctorFormValidation>>({
     resolver: zodResolver(DoctorFormValidation),
     defaultValues: {
-      ...DoctorFormDefaultValues,
+      ...defaultValues,
       name: user.name,
       email: user.email,
       phone: user.phone,
     },
   });
+
+  if (user.isDone) {
+    setDefaultValues({
+      userId: user.id || "",
+      name: user.name || "",
+      email: user.email || "",
+      phone: user.phone || "",
+      specialty: user.doctorDetails.specialty || "",
+      licenseNumber: user.doctorDetails.licenseNumber || "",
+      identificationDocumentType: user.doctorDetails.identificationDocumentType || "",
+      cpf: user.doctorDetails.cpf || "",
+      identificationDocument: undefined,
+      privacyConsent: user.doctorDetails.privacyConsent || false,
+      password: user.password || "",
+      role: user.role || "",
+    });
+  }
 
   const onSubmit = async (values: z.infer<typeof DoctorFormValidation>) => {
     console.log(values);
@@ -60,7 +77,7 @@ const DoctorRegisterForm: React.FC<DoctorRegisterFormProps> = ({ user }) => {
         specialty: values.specialty,
         licenseNumber: values.licenseNumber,
         identificationType: values.identificationType,
-        identificationNumber: values.identificationNumber,
+        cpf: values.cpf,
         identificationDocument: values.identificationDocument ? formData : undefined,
         privacyConsent: values.privacyConsent,
         password: user.password,
@@ -160,8 +177,8 @@ const DoctorRegisterForm: React.FC<DoctorRegisterFormProps> = ({ user }) => {
             <CustomFormField
               fieldType={FormFieldType.INPUT}
               control={form.control}
-              name="identificationNumber"
-              label="Número de Identificação"
+              name="cpf"
+              label="CPF"
               placeholder="123456789"
             />
           </div>
@@ -198,4 +215,4 @@ const DoctorRegisterForm: React.FC<DoctorRegisterFormProps> = ({ user }) => {
   );
 };
 
-export default DoctorRegisterForm;
+export default DoctorDetailsForm;

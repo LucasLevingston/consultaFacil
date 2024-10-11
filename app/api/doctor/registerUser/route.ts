@@ -1,4 +1,4 @@
-import { getUser } from "@/lib/actions/patient.actions";
+import { getUser } from "@/lib/actions/user.actions";
 import { storage, BUCKET_ID, ENDPOINT, PROJECT_ID } from "@/lib/appwrite.config";
 import { prisma } from "@/lib/prisma";
 import { InputFile, ID } from "node-appwrite";

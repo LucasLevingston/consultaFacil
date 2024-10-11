@@ -1,32 +1,18 @@
-"use client";
+"use server";
 
 import Image from "next/image";
 import Link from "next/link";
 import { StatCard } from "@/components/StatCard";
 import { columns } from "@/components/table/columns";
 import { DataTable } from "@/components/table/DataTable";
-import { getRecentAppointmentsByDoctorId } from "@/lib/actions/appointment.actions";
-import { useSession } from "next-auth/react";
-import { auth } from "@/app/api/auth/auth";
-import { getUserByEmail } from "@/lib/actions/user.actions";
-import { redirect } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { getAppointmentsByDoctorId } from "@/lib/actions/appointment.actions";
+import { User } from "@prisma/client";
 
-const AdminPage = async () => {
-  const route = useRouter();
-  const session = await auth();
-  console.log(session);
-  if (!session) {
-    route.push("/");
-  }
-
-  const user = await getUserByEmail(session?.user?.email);
-
-  if (!user) {
-    redirect("/");
-  }
-
-  const appointments = await getRecentAppointmentsByDoctorId(user.id);
+interface DoctorRegisterFormProps {
+  user: User;
+}
+const DoctorDashboard: React.FC<DoctorRegisterFormProps> = async ({ user }) => {
+  const appointments = await getAppointmentsByDoctorId(user.id);
 
   if (!appointments) {
     return <p>Failed to load appointments. Please try again later.</p>;
@@ -44,32 +30,33 @@ const AdminPage = async () => {
             className="h-8 w-fit"
           />
         </Link>
-        <p className="text-16-semibold">Admin Dashboard</p>
+
+        <p className="text-16-semibold">Doctor Dashboard</p>
       </header>
 
       <main className="admin-main">
         <section className="w-full space-y-4">
-          <h1 className="header">Welcome 👋</h1>
-          <p className="text-dark-700">Start the day with managing new appointments</p>
+          <h1 className="header">Welcome, Dr. {user.name} 👋</h1>
+          <p className="text-dark-700">Here's an overview of your appointments.</p>
         </section>
 
         <section className="admin-stat">
           <StatCard
             type="appointments"
             count={appointments.scheduledCount}
-            label="Scheduled appointments"
+            label="Scheduled Appointments"
             icon={"/assets/icons/appointments.svg"}
           />
           <StatCard
             type="pending"
             count={appointments.pendingCount}
-            label="Pending appointments"
+            label="Pending Appointments"
             icon={"/assets/icons/pending.svg"}
           />
           <StatCard
             type="cancelled"
             count={appointments.cancelledCount}
-            label="Cancelled appointments"
+            label="Cancelled Appointments"
             icon={"/assets/icons/cancelled.svg"}
           />
         </section>
@@ -80,4 +67,4 @@ const AdminPage = async () => {
   );
 };
 
-export default AdminPage;
+export default DoctorDashboard;

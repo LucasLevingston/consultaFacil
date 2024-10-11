@@ -3,8 +3,9 @@
 import { ID, InputFile } from "node-appwrite";
 import { BUCKET_ID, ENDPOINT, PROJECT_ID, storage } from "../appwrite.config";
 import { prisma } from "@/lib/prisma";
-import { RegisterDoctorParams } from "@/types";
-import { getUser } from "./patient.actions";
+import { getUser } from "./user.actions";
+import { Role } from "@prisma/client";
+import { Doctor, RegisterDoctorParams } from "@/types";
 
 export const registerDoctor = async ({
   identificationDocument,
@@ -83,23 +84,12 @@ export const registerDoctor = async ({
 };
 
 export async function getDoctor(doctorId: string) {
-  try {
-    const doctor = await prisma.user.findUnique({
-      where: { id: doctorId },
-    });
-    return doctor;
-  } catch (error) {
-    console.error("An error occurred while retrieving the doctor details:", error);
-    throw error;
-  }
+  return await prisma.doctorDetails.findUnique({
+    where: { id: doctorId },
+  });
 }
 
 export async function getAllDoctors() {
-  try {
-    const doctors = await prisma.doctorDetails.findMany();
-    return doctors ? doctors : [];
-  } catch (error) {
-    console.error("An error occurred while retrieving the doctor details:", error);
-    throw error;
-  }
+  const doctors = await prisma.doctorDetails.findMany();
+  return doctors ? doctors : [];
 }

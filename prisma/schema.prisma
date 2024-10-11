@@ -43,11 +43,12 @@ model Session {
 
 model User {
   id            String    @id @default(uuid())
-  name          String
-  email         String   @unique
+  name          String?
+  email         String?   @unique
   emailVerified DateTime? @map("email_verified")
-  phone String
-  password String
+
+  phone String?
+  password String?
   image         String?
   isDone Boolean @default(false)
   role Role
@@ -60,7 +61,8 @@ model User {
 
   @@map("users")
 }
-enum Role{
+
+enum Role {
   patient
   doctor
   admin
@@ -83,8 +85,12 @@ model DoctorDetails {
   name                     String?
   email                     String?
   licenseNumber             String?
-  identificationDocumentId  String?
+  privacyConsent            Boolean?
+  cpf String?
+  identificationDocumentId String?
+  identificationDocumentType  String?
   identificationDocumentUrl String?
+
 
   user User @relation(fields: [userId], references: [id])
 
@@ -97,7 +103,6 @@ model PatientDetails {
   phone                     String? 
   name                     String?
   email                     String?
-  privacyConsent            Boolean?
   gender                    Gender?
   birthDate                 DateTime?
   address                   String?
@@ -108,8 +113,14 @@ model PatientDetails {
   currentMedication         String?
   familyMedicalHistory      String?
   pastMedicalHistory        String?
-  identificationDocumentId  String?
+  privacyConsent            Boolean?
+  treatmentConsent Boolean?
+  disclosureConsent Boolean?
+  cpf String?
+  identificationDocumentId String?
+  identificationDocumentType  String?
   identificationDocumentUrl String?
+
 
   user User @relation(fields: [userId], references: [id])
 

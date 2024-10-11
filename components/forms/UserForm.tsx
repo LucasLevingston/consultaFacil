@@ -1,11 +1,8 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { signIn } from "next-auth/react";
 
 import { Form } from "@/components/ui/form";
 import { UserFormValidation, LoginFormValidation } from "@/lib/validation";
@@ -15,25 +12,14 @@ import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
 import { SelectItem } from "../ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  createUser,
-  registerUser,
-  signInWithCreds,
-  signInWithGoogle,
-} from "@/lib/actions/user.actions";
-import router from "next/router";
+import { signInWithCreds, signInWithGoogle } from "@/lib/actions/user.actions";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "../ui/button";
 import GoogleIcon from "../icons/GoogleIcon";
-import { auth } from "@/app/api/auth/auth";
 
-export const UserForm = async () => {
+export const UserForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const session = await auth();
-  if (session) {
-    redirect("/");
-  }
 
   const registerForm = useForm<z.infer<typeof UserFormValidation>>({
     resolver: zodResolver(UserFormValidation),
@@ -62,7 +48,7 @@ export const UserForm = async () => {
     });
     const data = await response.json();
 
-    toast({ title: "Account created!" });
+    toast({ title: data });
 
     setTimeout(() => {
       router.push(`/${values.role}/${data.id}/register`);
@@ -82,7 +68,7 @@ export const UserForm = async () => {
     if (response?.error) {
       toast({
         variant: "destructive",
-        title: "Invalid credentials, please try again",
+        title: response.json(),
       });
       return;
     }

@@ -2,10 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { CreateUserParams } from "@/types";
+import { CreateUserParams, Doctor, Patient } from "@/types";
 import { comparePassword, hashPassword } from "../utils";
 import { signIn, SignInResponse, signOut } from "next-auth/react";
-import { auth } from "@/app/api/auth/auth";
+import { User } from "@prisma/client";
 
 export const getUserByEmail = async (email: string) => {
   return await prisma.user.findUnique({
@@ -92,8 +92,62 @@ export const signout = async () => {
   await signOut();
 };
 
-export async function getCurrentUser() {
-  const sesstion = await auth();
-  const user = await getUserByEmail(sesstion?.user?.email);
-  return user;
-}
+export const getUser = async (userId: string) => {
+  return await prisma.user.findUnique({ where: { id: userId } });
+};
+
+export const updateUser = async (user: Doctor | Patient): Promise<User | null> => {
+  if (user.role === "doctor") {
+    return await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        doctorDetails: {
+          update: {
+            specialty: user.doctorDetails?.specialty,
+            phone: user.doctorDetails?.phone,
+            email: user.doctorDetails?.email,
+            licenseNumber: user.doctorDetails?.licenseNumber,
+            identificationDocumentId: user.doctorDetails?.identificationDocumentId,
+            identificationDocumentUrl: user.doctorDetails?.identificationDocumentUrl,
+          },
+        },
+      },
+    });
+  }
+
+  if (user.role === "patient") {
+    return await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        patientDetails: {
+          update: {
+            phone: user.patientDetails?.phone,
+            name: user.patientDetails?.name,
+            email: user.patientDetails?.email,
+            privacyConsent: user.patientDetails?.privacyConsent,
+            gender: user.patientDetails?.gender,
+            birthDate: user.patientDetails?.birthDate,
+            address: user.patientDetails?.address,
+            occupation: user.patientDetails?.occupation,
+            emergencyContactName: user.patientDetails?.emergencyContactName,
+            emergencyContactNumber: user.patientDetails?.emergencyContactNumber,
+            allergies: user.patientDetails?.allergies,
+            currentMedication: user.patientDetails?.currentMedication,
+            familyMedicalHistory: user.patientDetails?.familyMedicalHistory,
+            pastMedicalHistory: user.patientDetails?.pastMedicalHistory,
+            identificationDocumentId: user.patientDetails?.identificationDocumentId,
+            identificationDocumentUrl: user.patientDetails?.identificationDocumentUrl,
+          },
+        },
+      },
+    });
+  }
+
+  return null;
+};

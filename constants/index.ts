@@ -2,46 +2,6 @@ import { Gender } from "@prisma/client";
 
 export const GenderOptions = ["male", "female", "other"];
 
-export const PatientFormDefaultValues = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  birthDate: new Date(Date.now()),
-  gender: "male" as Gender,
-  address: "",
-  occupation: "",
-  emergencyContactName: "",
-  emergencyContactNumber: "",
-  primaryPhysician: "",
-  insuranceProvider: "",
-  insurancePolicyNumber: "",
-  allergies: "",
-  currentMedication: "",
-  familyMedicalHistory: "",
-  pastMedicalHistory: "",
-  identificationType: "Birth Certificate",
-  identificationNumber: "",
-  identificationDocument: [],
-  treatmentConsent: false,
-  disclosureConsent: false,
-  privacyConsent: false,
-};
-export const DoctorFormDefaultValues = {
-  userId: "", // Will be set dynamically based on the logged-in user
-  name: "",
-  email: "",
-  phone: "",
-  specialty: "", // Default to an empty string, can be optional
-  licenseNumber: "", // Default to an empty string, can be optional
-  identificationType: "", // Default to an empty string
-  identificationNumber: "", // Default to an empty string
-  identificationDocument: undefined, // Default to undefined
-  privacyConsent: false, // Default to false, needs to be checked by the user
-  password: "", // Default to an empty string, can be set dynamically
-  role: "doctor", // Default role
-};
-
 export const IdentificationTypes = [
   "Birth Certificate",
   "Driver's License",

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -18,10 +18,7 @@ import { Form } from "../ui/form";
 import { getAllDoctors } from "@/lib/actions/doctor.actions";
 import { Appointment, DoctorDetails, Status, User } from "@prisma/client";
 import { CreateAppointmentParams, UpdateAppointmentParams } from "@/types";
-import { auth } from "@/app/api/auth/auth";
 import { useSession } from "next-auth/react";
-import { getCurrentUser, getUserByEmail } from "@/lib/actions/user.actions";
-import { type } from "os";
 
 export const AppointmentForm = ({
   type = "create",
@@ -32,7 +29,7 @@ export const AppointmentForm = ({
   appointment?: Appointment;
   setOpen?: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const { data: session, status } = useSession();
+  const session = useSession();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [doctors, setDoctors] = useState<DoctorDetails[]>([]);
@@ -46,11 +43,7 @@ export const AppointmentForm = ({
       }
       setDoctors(allDoctors);
     };
-    const fetchUser = async () => {
-      const user = await getCurrentUser();
-      setPatient(user);
-      console.log(user);
-    };
+    const fetchUser = async () => {};
     fetchUser();
     fetchDoctors();
   }, []);

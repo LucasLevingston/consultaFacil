@@ -11,39 +11,74 @@ import { Form, FormControl } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SelectItem } from "@/components/ui/select";
-import {
-  Doctors,
-  GenderOptions,
-  IdentificationTypes,
-  PatientFormDefaultValues,
-} from "@/constants";
+import { Doctors, GenderOptions, IdentificationTypes } from "@/constants";
 import { registerPatient } from "@/lib/actions/patient.actions";
-import { PatientFormValidation } from "@/lib/validation";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "react-phone-number-input/style.css";
-import CustomFormField, { FormFieldType } from "../CustomFormField";
-import { FileUploader } from "../FileUploader";
-import SubmitButton from "../SubmitButton";
-import { User } from "@prisma/client";
-import { RegisterPatientParams } from "@/types";
+import CustomFormField, { FormFieldType } from "../../CustomFormField";
+import { FileUploader } from "../../FileUploader";
+import SubmitButton from "../../SubmitButton";
+import { Patient, RegisterPatientParams } from "@/types";
+import { PatientFormDefaultValues } from "./DefaultValues";
+import { PatientFormValidation } from "./FormValidation";
 
-interface PatientRegisterFormProps {
-  user: User;
-}
-const PatientRegisterForm: React.FC<PatientRegisterFormProps> = ({ user }) => {
+const PatientRegisterForm = ({ user }: { user: Patient }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [defaultValues, setDefaultValues] = useState(PatientFormDefaultValues);
 
   const form = useForm<z.infer<typeof PatientFormValidation>>({
     resolver: zodResolver(PatientFormValidation),
     defaultValues: {
-      ...PatientFormDefaultValues,
+      ...defaultValues,
       name: user.name,
       email: user.email,
       phone: user.phone,
     },
   });
+
+  if (user.isDone) {
+    setDefaultValues({
+      name: user.name || PatientFormDefaultValues.name,
+      email: user.email || PatientFormDefaultValues.email,
+      phone: user.phone || PatientFormDefaultValues.phone,
+      birthDate: user.patientDetails.birthDate
+        ? new Date(user.patientDetails.birthDate)
+        : PatientFormDefaultValues.birthDate,
+      gender: user.patientDetails.gender || PatientFormDefaultValues.gender,
+      address: user.patientDetails.address || PatientFormDefaultValues.address,
+      occupation: user.patientDetails.occupation || PatientFormDefaultValues.occupation,
+      emergencyContactName:
+        user.patientDetails.emergencyContactName ||
+        PatientFormDefaultValues.emergencyContactName,
+      emergencyContactNumber:
+        user.patientDetails.emergencyContactNumber ||
+        PatientFormDefaultValues.emergencyContactNumber,
+      allergies: user.patientDetails.allergies || PatientFormDefaultValues.allergies,
+      currentMedication:
+        user.patientDetails.currentMedication ||
+        PatientFormDefaultValues.currentMedication,
+      familyMedicalHistory:
+        user.patientDetails.familyMedicalHistory ||
+        PatientFormDefaultValues.familyMedicalHistory,
+      pastMedicalHistory:
+        user.patientDetails.pastMedicalHistory ||
+        PatientFormDefaultValues.pastMedicalHistory,
+      identificationDocumentType:
+        user.patientDetails.identificationDocumentType ||
+        PatientFormDefaultValues.identificationDocumentType,
+      cpf: user.patientDetails.cpf || PatientFormDefaultValues.cpf,
+      identificationDocument: undefined,
+      treatmentConsent:
+        user.patientDetails.treatmentConsent || PatientFormDefaultValues.treatmentConsent,
+      disclosureConsent:
+        user.patientDetails.disclosureConsent ||
+        PatientFormDefaultValues.disclosureConsent,
+      privacyConsent:
+        user.patientDetails.privacyConsent || PatientFormDefaultValues.privacyConsent,
+    });
+  }
 
   const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
     setIsLoading(true);
@@ -78,7 +113,7 @@ const PatientRegisterForm: React.FC<PatientRegisterFormProps> = ({ user }) => {
         familyMedicalHistory: values.familyMedicalHistory,
         pastMedicalHistory: values.pastMedicalHistory,
         identificationType: values.identificationType,
-        identificationNumber: values.identificationNumber,
+        cpf: values.cpf,
         identificationDocument: values.identificationDocument ? formData : undefined,
         privacyConsent: values.privacyConsent,
         password: user.password,
@@ -244,25 +279,6 @@ const PatientRegisterForm: React.FC<PatientRegisterFormProps> = ({ user }) => {
             ))}
           </CustomFormField>
 
-          {/* SEGURO & NÚMERO DA APÓLICE */}
-          <div className="flex flex-col gap-6 xl:flex-row">
-            <CustomFormField
-              fieldType={FormFieldType.INPUT}
-              control={form.control}
-              name="insuranceProvider"
-              label="Fornecedor de Seguro"
-              placeholder="BlueCross BlueShield"
-            />
-
-            <CustomFormField
-              fieldType={FormFieldType.INPUT}
-              control={form.control}
-              name="insurancePolicyNumber"
-              label="Número da Apólice de Seguro"
-              placeholder="ABC123456789"
-            />
-          </div>
-
           {/* ALERGIAS & MEDICAÇÕES ATUAIS */}
           <div className="flex flex-col gap-6 xl:flex-row">
             <CustomFormField
@@ -324,7 +340,7 @@ const PatientRegisterForm: React.FC<PatientRegisterFormProps> = ({ user }) => {
           <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
-            name="identificationNumber"
+            name="cpf"
             label="Número de Identificação"
             placeholder="123456789"
           />
