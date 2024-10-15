@@ -16,36 +16,35 @@ import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
 import { Form } from "../ui/form";
 import { getAllDoctors } from "@/lib/actions/doctor.actions";
-import { Appointment, DoctorDetails, Status, User } from "@prisma/client";
+import { Appointment, Status } from "@prisma/client";
 import { CreateAppointmentParams, UpdateAppointmentParams } from "@/types";
-import { useSession } from "next-auth/react";
+import { auth } from "@/auth";
 
 export const AppointmentForm = ({
   type = "create",
   appointment,
   setOpen,
+  doctorId,
 }: {
   type: "create" | "schedule" | "cancel";
   appointment?: Appointment;
   setOpen?: Dispatch<SetStateAction<boolean>>;
+  doctorId?: string | null;
 }) => {
-  const session = useSession();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [doctors, setDoctors] = useState<DoctorDetails[]>([]);
-  const [patient, setPatient] = useState<User | null>();
+  const [session, setSession] = useState<any>(null); // Ajuste o tipo conforme necessário
+  const [doctors, setDoctors] = useState<any[]>([]); // Ajuste o tipo conforme necessário
 
   useEffect(() => {
-    const fetchDoctors = async () => {
-      const allDoctors = await getAllDoctors();
-      if (!allDoctors) {
-        throw new Error("No have doctors");
-      }
-      setDoctors(allDoctors);
+    const fetchData = async () => {
+      const userSession = await auth();
+      setSession(userSession);
+      const doctorList = await getAllDoctors();
+      setDoctors(doctorList);
     };
-    const fetchUser = async () => {};
-    fetchUser();
-    fetchDoctors();
+
+    fetchData();
   }, []);
 
   const AppointmentFormValidation = getAppointmentSchema(type);
@@ -53,7 +52,7 @@ export const AppointmentForm = ({
   const form = useForm<z.infer<typeof AppointmentFormValidation>>({
     resolver: zodResolver(AppointmentFormValidation),
     defaultValues: {
-      doctorId: appointment ? appointment.doctorId : "",
+      doctorId: appointment ? appointment.doctorId : doctorId || "",
       schedule: appointment ? new Date(appointment.schedule) : new Date(),
       reason: appointment ? appointment.reason ?? "" : "",
       note: appointment?.note ?? "",
@@ -78,11 +77,11 @@ export const AppointmentForm = ({
 
     try {
       if (type === "create") {
-        if (!user.id) {
-          throw new Error("User not logged");
+        if (!session?.user.id) {
+          throw new Error("User not logged in");
         }
         const newAppointment: CreateAppointmentParams = {
-          patientId: user.id,
+          patientId: session.user.id,
           doctorId: values.doctorId,
           schedule: new Date(values.schedule),
           reason: values.reason ?? undefined,
@@ -93,7 +92,7 @@ export const AppointmentForm = ({
         if (createdAppointment) {
           form.reset();
           router.push(
-            `/patients/${user?.id}/new-appointment/success?appointmentId=${createdAppointment.id}`
+            `/patients/${session.user.id}/new-appointment/success?appointmentId=${createdAppointment.id}`
           );
         }
       } else if (type === "schedule" || type === "cancel") {
@@ -103,7 +102,7 @@ export const AppointmentForm = ({
           appointment: {
             doctorId: values.doctorId,
             schedule: new Date(values.schedule),
-            status: status, // Aqui o status está correto
+            status: status,
             cancellationReason: values.cancellationReason,
           },
           type,
@@ -117,9 +116,9 @@ export const AppointmentForm = ({
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   let buttonLabel;
@@ -146,21 +145,25 @@ export const AppointmentForm = ({
 
         {type !== "cancel" && (
           <>
-            <CustomFormField
-              fieldType={FormFieldType.SELECT}
-              control={form.control}
-              name="doctorId"
-              label="Médico"
-              placeholder="Selecione um médico"
-            >
-              {doctors?.map((doctor) => (
-                <SelectItem key={doctor.id} value={doctor.id}>
-                  <div className="flex cursor-pointer items-center gap-2">
-                    <p>{doctor.name}</p>
-                  </div>
-                </SelectItem>
-              ))}
-            </CustomFormField>
+            {doctorId ? (
+              <input type="hidden" value={doctorId} {...form.register("doctorId")} />
+            ) : (
+              <CustomFormField
+                fieldType={FormFieldType.SELECT}
+                control={form.control}
+                name="doctorId"
+                label="Médico"
+                placeholder="Selecione um médico"
+              >
+                {doctors?.map((doctor) => (
+                  <SelectItem key={doctor.id} value={doctor.id}>
+                    <div className="flex cursor-pointer items-center gap-2">
+                      <p>{doctor.name}</p>
+                    </div>
+                  </SelectItem>
+                ))}
+              </CustomFormField>
+            )}
 
             <CustomFormField
               fieldType={FormFieldType.DATE_PICKER}
@@ -198,7 +201,7 @@ export const AppointmentForm = ({
             fieldType={FormFieldType.TEXTAREA}
             control={form.control}
             name="cancellationReason"
-            label="Motivo da cancelamento"
+            label="Motivo do cancelamento"
             placeholder="Reunião urgente surgiu"
           />
         )}

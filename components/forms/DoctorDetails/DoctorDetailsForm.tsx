@@ -20,9 +20,10 @@ import { FileUploader } from "@/components/FileUploader";
 import SubmitButton from "@/components/SubmitButton";
 import { getDefaultValues } from "./DefaultValues";
 import { DoctorFormValidation } from "./FormValidation";
+import { ExtendUser } from "@/next-auth";
 
 interface DoctorDetailsProps {
-  user: Doctor;
+  user: ExtendUser;
   type: "edit" | "create";
 }
 

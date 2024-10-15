@@ -2,13 +2,14 @@ import { DoctorDetails, PatientDetails, Role } from "@prisma/client";
 import NextAuth, { type DefaultSession } from "next-auth";
 
 export type ExtendUser = DefaultSession["user"] & {
+  id: string;
   role: Role;
   isDone: boolean;
   patientDetails: PatientDetails;
   doctorDetails: DoctorDetails;
-  // emailVerified: boolean;
-  // phone: string;
-  // password: string;
+  emailVerified: Date | null;
+  phone: string;
+  password: string;
 };
 
 declare module "next-auth" {

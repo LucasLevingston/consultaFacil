@@ -20,6 +20,7 @@ import {
   DropdownMenuItem,
 } from "./ui/dropdown-menu";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
+import { SignOut } from "@/lib/actions/user.actions";
 
 export async function Header() {
   const session = await auth();
@@ -86,6 +87,18 @@ export async function Header() {
           </Link>
           <Link
             className="text-sm font-medium hover:underline underline-offset-4"
+            href="/doutores"
+          >
+            Médicos
+          </Link>
+          <Link
+            className="text-sm font-medium hover:underline underline-offset-4"
+            href="/clinicas"
+          >
+            Clinicas e organizações
+          </Link>
+          <Link
+            className="text-sm font-medium hover:underline underline-offset-4"
             href="/contact"
           >
             Contato
@@ -141,10 +154,10 @@ export async function Header() {
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuItem asChild>
-                    <Link href="/api/auth/signout" className="flex items-center">
+                    <button onClick={SignOut} className="flex items-center">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Sair da conta</span>
-                    </Link>
+                    </button>
                   </DropdownMenuItem>
                 </>
               ) : (

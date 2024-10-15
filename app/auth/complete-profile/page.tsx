@@ -1,8 +1,9 @@
 import Image from "next/image";
-
 import PatientDetailsForm from "@/components/forms/PatientDetails/PatientDetailsForm";
 import { auth } from "@/auth";
 import DoctorDetailsForm from "@/components/forms/DoctorDetails/DoctorDetailsForm";
+import Loading from "@/components/loading";
+import { ExtendUser } from "@/next-auth";
 
 const Register = async () => {
   const session = await auth();
@@ -22,10 +23,14 @@ const Register = async () => {
             <h1 className="header">Bem-vindo 👋</h1>
             <p className="text-dark-700">Conte-nos mais sobre você.</p>
           </section>
-          {session?.user && session?.user.role === "doctor" && session.user ? (
-            <DoctorDetailsForm user={session?.user} type="create" />
+          {session?.user ? (
+            session.user.role === "doctor" ? (
+              <DoctorDetailsForm user={session.user as ExtendUser} type="create" />
+            ) : (
+              <PatientDetailsForm user={session.user as ExtendUser} type="create" />
+            )
           ) : (
-            <PatientDetailsForm user={session?.user} type="create" />
+            <Loading />
           )}
 
           <p className="copyright py-12">© 2024 CarePluse</p>

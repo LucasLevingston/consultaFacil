@@ -1,4 +1,4 @@
-import { Role, Status, User, PatientDetails, DoctorDetails } from "@prisma/client";
+import { Role, Status, PatientDetails, DoctorDetails } from "@prisma/client";
 
 declare type SearchParamProps = {
   params: { [key: string]: string };
@@ -66,13 +66,23 @@ export interface RegisterDoctorParams extends CreateUserParams {
   password: string;
   role: string;
 }
-
+export interface User {
+  name?: string | null;
+  id: string;
+  phone?: string | null;
+  email?: string | null;
+  role: $Enums.Role;
+  image?: string | null;
+  emailVerified: Date | null;
+  password?: string | null;
+  isDone: boolean;
+}
 export interface Doctor extends User {
-  role: "doctor";
+  role: Role;
   doctorDetails: DoctorDetails;
 }
 
 export interface Patient extends User {
-  role: "patient";
+  role: Role;
   patientDetails: PatientDetails;
 }

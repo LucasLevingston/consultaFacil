@@ -40,7 +40,7 @@ export const {
         session.user.id = token.sub;
       }
       if (token.user && session.user) {
-        session.user = token.user as Patient | Doctor;
+        session.user = { ...(token.user as Patient | Doctor), ...session.user };
       }
 
       return session;

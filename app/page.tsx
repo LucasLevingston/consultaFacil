@@ -12,7 +12,7 @@ import { FeaturesSection } from "@/components/FeaturesSection";
 export default function Home() {
   const router = useRouter();
   const handleRedirect = () => {
-    router.push("/new-appointment");
+    router.push("/agendar-consulta");
   };
 
   return (
