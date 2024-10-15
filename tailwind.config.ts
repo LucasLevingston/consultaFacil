@@ -21,6 +21,7 @@ const config = {
     },
     extend: {
       colors: {
+        mainColor: "#22C0EA",
         green: {
           500: "#24AE7C",
           600: "#0D2A1F",
@@ -48,6 +49,15 @@ const config = {
       },
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
+        "work-sans": [
+          '"Work Sans"',
+          "Roboto",
+          "Helvetica Neue",
+          "Helvetica",
+          "Segoe UI",
+          "Arial",
+          "sans-serif",
+        ],
       },
       backgroundImage: {
         appointments: "url('/assets/images/appointments-bg.png')",

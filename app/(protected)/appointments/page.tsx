@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { auth } from "@/app/api/auth/auth";
+import { auth } from "@/auth";
 import { getUserByEmail } from "@/lib/actions/user.actions";
 import DoctorDashboard from "./_components/DoctorAppointments";
 import PatientDashboard from "./_components/PatientAppointments";

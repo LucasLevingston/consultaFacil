@@ -18,40 +18,25 @@ import { registerDoctor } from "@/lib/actions/doctor.actions";
 import CustomFormField, { FormFieldType } from "@/components/CustomFormField";
 import { FileUploader } from "@/components/FileUploader";
 import SubmitButton from "@/components/SubmitButton";
-import { DoctorFormDefaultValues } from "./DefaultValues";
+import { getDefaultValues } from "./DefaultValues";
 import { DoctorFormValidation } from "./FormValidation";
 
-const DoctorDetailsForm = ({ user }: { user: Doctor }) => {
+interface DoctorDetailsProps {
+  user: Doctor;
+  type: "edit" | "create";
+}
+
+const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [defaultValues, setDefaultValues] = useState(DoctorFormDefaultValues);
+  const defaultValues = getDefaultValues(user);
 
   const form = useForm<z.infer<typeof DoctorFormValidation>>({
     resolver: zodResolver(DoctorFormValidation),
     defaultValues: {
       ...defaultValues,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
     },
   });
-
-  if (user.isDone) {
-    setDefaultValues({
-      userId: user.id || "",
-      name: user.name || "",
-      email: user.email || "",
-      phone: user.phone || "",
-      specialty: user.doctorDetails.specialty || "",
-      licenseNumber: user.doctorDetails.licenseNumber || "",
-      identificationDocumentType: user.doctorDetails.identificationDocumentType || "",
-      cpf: user.doctorDetails.cpf || "",
-      identificationDocument: undefined,
-      privacyConsent: user.doctorDetails.privacyConsent || false,
-      password: user.password || "",
-      role: user.role || "",
-    });
-  }
 
   const onSubmit = async (values: z.infer<typeof DoctorFormValidation>) => {
     console.log(values);
@@ -80,7 +65,7 @@ const DoctorDetailsForm = ({ user }: { user: Doctor }) => {
         cpf: values.cpf,
         identificationDocument: values.identificationDocument ? formData : undefined,
         privacyConsent: values.privacyConsent,
-        password: user.password,
+        password: user.password ? user.password : "",
         role: user.role,
       };
 
@@ -98,11 +83,6 @@ const DoctorDetailsForm = ({ user }: { user: Doctor }) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 space-y-12">
-        <section className="space-y-4">
-          <h1 className="header">Bem-vindo, Doutor 👋</h1>
-          <p className="text-dark-700">Conte-nos mais sobre você.</p>
-        </section>
-
         <section className="space-y-6">
           <div className="mb-9 space-y-1">
             <h2 className="sub-header">Informações Pessoais</h2>
@@ -138,7 +118,13 @@ const DoctorDetailsForm = ({ user }: { user: Doctor }) => {
               placeholder="(555) 123-4567"
             />
           </div>
-
+          <CustomFormField
+            fieldType={FormFieldType.INPUT}
+            control={form.control}
+            name="cpf"
+            label="CPF"
+            placeholder="123456789"
+          />
           {/* ESPECIALIDADE & NÚMERO DA LICENÇA */}
           <div className="flex flex-col gap-6 xl:flex-row">
             <CustomFormField
@@ -157,59 +143,55 @@ const DoctorDetailsForm = ({ user }: { user: Doctor }) => {
               placeholder="123456"
             />
           </div>
-
-          {/* IDENTIFICAÇÃO */}
-          <div className="flex flex-col gap-6 xl:flex-row">
-            <CustomFormField
-              fieldType={FormFieldType.SELECT}
-              control={form.control}
-              name="identificationType"
-              label="Tipo de Identificação"
-              placeholder="Selecione o tipo de identificação"
-            >
-              {IdentificationTypes.map((type, i) => (
-                <SelectItem key={type + i} value={type}>
-                  {type}
-                </SelectItem>
-              ))}
-            </CustomFormField>
-
-            <CustomFormField
-              fieldType={FormFieldType.INPUT}
-              control={form.control}
-              name="cpf"
-              label="CPF"
-              placeholder="123456789"
-            />
-          </div>
-
-          <CustomFormField
-            fieldType={FormFieldType.SKELETON}
-            control={form.control}
-            name="identificationDocument"
-            label="Cópia Escaneada do Documento de Identificação"
-            renderSkeleton={(field) => (
-              <FormControl>
-                <FileUploader files={field.value} onChange={field.onChange} />
-              </FormControl>
-            )}
-          />
         </section>
+        {type === "create" && (
+          <>
+            <section>
+              <div className="flex flex-col gap-6 xl:flex-row">
+                <CustomFormField
+                  fieldType={FormFieldType.SELECT}
+                  control={form.control}
+                  name="identificationType"
+                  label="Tipo de Identificação"
+                  placeholder="Selecione o tipo de identificação"
+                >
+                  {IdentificationTypes.map((type, i) => (
+                    <SelectItem key={type + i} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </CustomFormField>
+              </div>
 
-        <section className="space-y-6">
-          <div className="mb-9 space-y-1">
-            <h2 className="sub-header">Consentimento e Privacidade</h2>
-          </div>
+              <CustomFormField
+                fieldType={FormFieldType.SKELETON}
+                control={form.control}
+                name="identificationDocument"
+                label="Cópia Escaneada do Documento de Identificação"
+                renderSkeleton={(field) => (
+                  <FormControl>
+                    <FileUploader files={field.value} onChange={field.onChange} />
+                  </FormControl>
+                )}
+              />
+            </section>
+            <section className="space-y-6">
+              <div className="mb-9 space-y-1">
+                <h2 className="sub-header">Consentimento e Privacidade</h2>
+              </div>
 
-          <CustomFormField
-            fieldType={FormFieldType.CHECKBOX}
-            control={form.control}
-            name="privacyConsent"
-            label="Eu reconheço que revisei e concordo com a política de privacidade."
-          />
-        </section>
-
-        <SubmitButton isLoading={isLoading}>Enviar e Continuar</SubmitButton>
+              <CustomFormField
+                fieldType={FormFieldType.CHECKBOX}
+                control={form.control}
+                name="privacyConsent"
+                label="Eu reconheço que revisei e concordo com a política de privacidade."
+              />
+            </section>
+          </>
+        )}
+        <SubmitButton isLoading={isLoading}>
+          {type === "create" ? "Enviar e Continuar" : "Salvar"}
+        </SubmitButton>{" "}
       </form>
     </Form>
   );

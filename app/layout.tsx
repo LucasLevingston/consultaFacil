@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/providers/authprovider";
 import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -31,18 +32,16 @@ export default function RootLayout({
   return (
     <AuthProvider>
       <html lang="en">
-        <body
-          className={cn(
-            "min-h-screen bg-dark-300 font-sans antialiased text-white",
-            fontSans.variable
-          )}
-        >
-          <ThemeProvider attribute="class" defaultTheme="system">
+        <ThemeProvider attribute="class" defaultTheme="system">
+          <body
+            className={cn("min-h-screen font-work-sans antialiased  ", fontSans.variable)}
+          >
             <Header />
-            {children}
+            <div className="flex flex-col font-work-sans">{children}</div>
+            <Footer />
             <Toaster />
-          </ThemeProvider>
-        </body>
+          </body>
+        </ThemeProvider>
       </html>
     </AuthProvider>
   );

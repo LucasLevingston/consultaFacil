@@ -39,8 +39,8 @@ export function ThemeForm() {
     theme.setTheme(data.theme as "light" | "dark");
 
     toast({
-      title: "Success",
-      description: "Your profile has been updated successfully.",
+      title: "Sucesso",
+      description: `O tema foi alterado para: ${data.theme}`,
     });
   });
 
@@ -49,7 +49,7 @@ export function ThemeForm() {
       <form onSubmit={onSubmit} className="space-y-8">
         <Card>
           <CardHeader>
-            <CardTitle>Tema</CardTitle>
+            <CardTitle className="bg-[#000}">Tema</CardTitle>
             <CardDescription>Selecione o tema para o painel.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -65,11 +65,14 @@ export function ThemeForm() {
                     className="grid max-w-md grid-cols-2 gap-8 pt-2"
                   >
                     <FormItem>
-                      <FormLabel className="[&:has([data-state=checked])>div]:border-primary">
+                      <FormLabel>
                         <FormControl>
-                          <RadioGroupItem value="light" className="sr-only" />
+                          <RadioGroupItem value="light" className="hidden" />
                         </FormControl>
-                        <div className="items-center rounded-md border-2 border-muted p-1 hover:border-accent">
+                        <div
+                          className={`items-center cursor-pointer rounded-md border-[3px] border-muted p-1 hover:border-accent ${field.value === "light" && "border-mainColor"}`}
+                        >
+                          {" "}
                           <div className="space-y-2 rounded-sm bg-[#ecedef] p-2">
                             <div className="space-y-2 rounded-md bg-white p-2 shadow-sm">
                               <div className="h-2 w-[80px] rounded-lg bg-[#ecedef]" />
@@ -91,11 +94,13 @@ export function ThemeForm() {
                       </FormLabel>
                     </FormItem>
                     <FormItem>
-                      <FormLabel className="[&:has([data-state=checked])>div]:border-primary">
+                      <FormLabel>
                         <FormControl>
-                          <RadioGroupItem value="dark" className="sr-only" />
+                          <RadioGroupItem value="dark" className="hidden" />
                         </FormControl>
-                        <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
+                        <div
+                          className={`items-center cursor-pointer rounded-md border-[3px] border-muted p-1 hover:border-accent ${field.value === "dark" ? "border-mainColor" : ""}`}
+                        >
                           <div className="space-y-2 rounded-sm bg-slate-950 p-2">
                             <div className="space-y-2 rounded-md bg-slate-800 p-2 shadow-sm">
                               <div className="h-2 w-[80px] rounded-lg bg-slate-400" />
@@ -125,8 +130,7 @@ export function ThemeForm() {
 
         <SheetFooter className="mt-auto">
           <Button disabled={form.formState.isLoading} type="submit">
-            {form.formState.isSubmitting && "Salvando..."}
-            {!form.formState.isSubmitting && "Salvar alterações"}
+            {form.formState.isSubmitting ? "Salvando..." : "Salvar alterações"}
           </Button>
         </SheetFooter>
       </form>

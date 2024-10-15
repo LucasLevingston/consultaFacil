@@ -8,9 +8,9 @@ declare type SearchParamProps = {
 declare type Gender = "male" | "female" | "other";
 
 declare interface CreateUserParams {
-  name: string;
+  name: string | null;
   email: string;
-  phone: string;
+  phone: string | null;
   password: string;
   role: "doctor" | "patient" | "admin";
 }
@@ -23,8 +23,6 @@ declare interface RegisterPatientParams extends CreateUserParams {
   occupation: string;
   emergencyContactName: string;
   emergencyContactNumber: string;
-  insuranceProvider: string;
-  insurancePolicyNumber: string;
   allergies?: string; // Use optional instead of undefined
   currentMedication?: string; // Use optional instead of undefined
   familyMedicalHistory?: string; // Use optional instead of undefined

@@ -1,17 +1,24 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 import { CreateUserParams, Doctor, Patient } from "@/types";
 import { comparePassword, hashPassword } from "../utils";
-import { signIn, SignInResponse, signOut } from "next-auth/react";
 import { User } from "@prisma/client";
+import { SignInResponse } from "next-auth/react";
+import { signIn, signOut } from "@/auth";
+import { AuthError } from "next-auth";
+import bcrypt from "bcryptjs";
 
 export const getUserByEmail = async (email: string) => {
   return await prisma.user.findUnique({
     where: { email },
+    include: {
+      doctorDetails: true,
+      patientDetails: true,
+    },
   });
 };
+
 export async function createUser(user: CreateUserParams) {
   try {
     const result: SignInResponse | undefined = await signIn("credentials", {
@@ -63,37 +70,51 @@ export const registerUser = async (formData: CreateUserParams) => {
 export const signInWithCreds = async (data: { email: string; password: string }) => {
   const existingUser = await getUserByEmail(data.email);
   if (!existingUser) {
-    throw new Error("User not found.");
+    return { error: "User not found." };
   }
+  if (!existingUser || !existingUser.password) return null;
 
-  const isValidPassword = await comparePassword(data.password, existingUser.password);
-  if (!isValidPassword) {
-    throw new Error("Invalid credentials!");
+  const passwordMatch = await bcrypt.compare(data.password, existingUser.password);
+
+  if (!passwordMatch) return { error: "Invalid credentials!" };
+  try {
+    await signIn("credentials", {
+      email: data.email,
+      password: data.password,
+      redirectTo: "/",
+    });
+    const user = await getUserByEmail(data.email);
+    return user;
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return { error: "Invalid credentials!" };
+        default:
+          return { error: "Something went wrong!" };
+      }
+    }
+
+    throw error;
   }
-  const result = await signIn("credentials", {
-    email: data.email,
-    password: data.password,
-    redirect: false,
-  });
-
-  if (result?.error) {
-    throw new Error(result.error);
-  }
-
-  revalidatePath("/");
-  return { id: existingUser.id, isDone: existingUser.isDone, role: existingUser.role };
 };
 
 export const signInWithGoogle = async () => {
   await signIn("google");
 };
 
-export const signout = async () => {
-  await signOut();
+export const SignOut = async () => {
+  await signOut({ redirectTo: "/" });
 };
 
 export const getUser = async (userId: string) => {
-  return await prisma.user.findUnique({ where: { id: userId } });
+  return await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      doctorDetails: true,
+      patientDetails: true,
+    },
+  });
 };
 
 export const updateUser = async (user: Doctor | Patient): Promise<User | null> => {

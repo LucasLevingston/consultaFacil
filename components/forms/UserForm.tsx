@@ -15,8 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { signInWithCreds, signInWithGoogle } from "@/lib/actions/user.actions";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "../ui/button";
-import GoogleIcon from "../icons/GoogleIcon";
-
+import { FcGoogle } from "react-icons/fc";
 export const UserForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +41,7 @@ export const UserForm = () => {
 
   const onRegisterSubmit = async (values: z.infer<typeof UserFormValidation>) => {
     setIsLoading(true);
-    const response = await fetch(`/api/auth/${values.role}/register`, {
+    const response = await fetch(`/api/auth/create`, {
       method: "POST",
       body: JSON.stringify(values),
     });
@@ -51,7 +50,9 @@ export const UserForm = () => {
     toast({ title: data });
 
     setTimeout(() => {
-      router.push(`/${values.role}/${data.id}/register`);
+      if (data) {
+        router.push(`/auth/complete-profile`);
+      }
     }, 1000);
 
     setIsLoading(false);
@@ -60,21 +61,25 @@ export const UserForm = () => {
   const onLoginSubmit = async (values: z.infer<typeof LoginFormValidation>) => {
     setIsLoading(true);
 
-    const response = (await signInWithCreds({
+    const response = await signInWithCreds({
       email: values.email,
       password: values.password,
-    })) as any;
+    });
 
-    if (response?.error) {
+    if (!response) {
       toast({
+        title: "Error",
         variant: "destructive",
-        title: response.json(),
       });
       return;
     }
 
-    if (!response?.error) {
-      router.push(`/app/${response.role}`);
+    if (response) {
+      if (!response.isDone) {
+        router.push(`/auth/complete-profile`);
+      } else {
+        router.push(`/`);
+      }
     }
 
     toast({ title: "You are now signed in!" });
@@ -161,7 +166,7 @@ export const UserForm = () => {
               }}
               className="text-sm"
             >
-              <GoogleIcon />
+              <FcGoogle size="lg" />
             </Button>
             <SubmitButton isLoading={isLoading}>Registrar</SubmitButton>
           </form>

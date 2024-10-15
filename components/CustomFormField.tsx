@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Mail, User } from "lucide-react";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -50,16 +51,9 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
   switch (props.fieldType) {
     case FormFieldType.INPUT:
       return (
-        <div className="flex rounded-md border border-dark-500 bg-dark-400">
-          {props.iconSrc && (
-            <Image
-              src={props.iconSrc}
-              height={24}
-              width={24}
-              alt={props.iconAlt || "icon"}
-              className="ml-2"
-            />
-          )}
+        <div className="flex items-center rounded-md border px-2  border-dark-500 dark:bg-dark-400">
+          {props.name === "name" && <User className=" text-black dark:text-white" />}
+          {props.name === "email" && <Mail className=" text-black dark:text-white" />}
           <FormControl>
             <Input
               placeholder={props.placeholder}
@@ -112,22 +106,23 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
       );
     case FormFieldType.DATE_PICKER:
       return (
-        <div className="flex rounded-md border border-dark-500 bg-dark-400">
+        <div className="flex items-center rounded-md border border-dark-500 dark:bg-dark-400 p-2">
           <Image
             src="/assets/icons/calendar.svg"
             height={24}
             width={24}
-            alt="user"
+            alt="Calendar icon"
             className="ml-2"
           />
           <FormControl>
             <ReactDatePicker
               showTimeSelect={props.showTimeSelect ?? false}
               selected={field.value}
-              onChange={(date: Date) => field.onChange(date)}
+              onChange={(date) => field.onChange(date)}
               timeInputLabel="Time:"
               dateFormat={props.dateFormat ?? "MM/dd/yyyy"}
               wrapperClassName="date-picker"
+              className={`react-datepicker bg-dark-400 text-white border border-dark-500 rounded-md p-2 outline-none`}
             />
           </FormControl>
         </div>

@@ -44,6 +44,13 @@ export async function POST(request: Request) {
         doctorDetails: existingDoctorDetails
           ? {
               update: {
+                phone: user.phone,
+                email: user.email,
+                name: user.name,
+                identificationDocumentType:
+                  existingDoctorDetails.identificationDocumentType,
+                cpf: existingDoctorDetails.cpf || null,
+                privacyConsent: doctor.privacyConsent || null,
                 licenseNumber: doctor.licenseNumber || null,
                 identificationDocumentId: file.$id || null,
                 identificationDocumentUrl: file.$id
@@ -54,9 +61,11 @@ export async function POST(request: Request) {
             }
           : {
               create: {
-                email: user.email,
-                phone: user.phone,
-                name: user.name,
+                cpf: doctor.cpf,
+                privacyConsent: doctor.privacyConsent,
+                email: doctor.email,
+                phone: doctor.phone,
+                name: doctor.name,
                 licenseNumber: doctor.licenseNumber || null,
                 identificationDocumentId: file.$id || null,
                 identificationDocumentUrl: file.$id

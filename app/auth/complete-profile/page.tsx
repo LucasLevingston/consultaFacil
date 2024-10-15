@@ -1,14 +1,11 @@
 import Image from "next/image";
 
-import DoctorRegisterForm from "@/components/forms/DoctorDetails/DoctorDetailsForm";
-import PatientRegisterForm from "@/components/forms/PatientDetails/PatientRegisterForm";
-import { auth } from "@/app/api/auth/auth";
-import { getUserByEmail } from "@/lib/actions/user.actions";
+import PatientDetailsForm from "@/components/forms/PatientDetails/PatientDetailsForm";
+import { auth } from "@/auth";
+import DoctorDetailsForm from "@/components/forms/DoctorDetails/DoctorDetailsForm";
 
 const Register = async () => {
   const session = await auth();
-
-  const user = await getUserByEmail(session?.user?.email);
 
   return (
     <div className="flex h-screen max-h-screen">
@@ -21,10 +18,14 @@ const Register = async () => {
             alt="patient"
             className="mb-12 h-10 w-fit"
           />
-          {user && user.role === "doctor" ? (
-            <DoctorRegisterForm user={user} />
+          <section className="space-y-4">
+            <h1 className="header">Bem-vindo 👋</h1>
+            <p className="text-dark-700">Conte-nos mais sobre você.</p>
+          </section>
+          {session?.user && session?.user.role === "doctor" && session.user ? (
+            <DoctorDetailsForm user={session?.user} type="create" />
           ) : (
-            <PatientRegisterForm user={user} />
+            <PatientDetailsForm user={session?.user} type="create" />
           )}
 
           <p className="copyright py-12">© 2024 CarePluse</p>
