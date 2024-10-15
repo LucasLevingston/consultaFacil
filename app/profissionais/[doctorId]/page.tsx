@@ -1,7 +1,4 @@
-// app/profissionais/[doctorId]/page.tsx
-
-import { useRouter } from "next/navigation";
-import { PrismaClient, DoctorDetails } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 

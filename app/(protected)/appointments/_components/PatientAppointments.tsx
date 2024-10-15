@@ -6,10 +6,10 @@ import { StatCard } from "@/components/StatCard";
 import { columns } from "@/components/table/columns";
 import { DataTable } from "@/components/table/DataTable";
 import { getAppointmentsByPatientId } from "@/lib/actions/appointment.actions"; // Function to fetch patient's appointments
-import { User } from "@prisma/client";
+import { ExtendUser } from "@/next-auth";
 
 interface PatientAppointmentsProps {
-  user: User;
+  user: ExtendUser;
 }
 
 const PatientAppointments: React.FC<PatientAppointmentsProps> = async ({ user }) => {

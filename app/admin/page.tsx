@@ -6,14 +6,14 @@ import Link from "next/link";
 import { StatCard } from "@/components/StatCard";
 import { columns } from "@/components/table/columns";
 import { DataTable } from "@/components/table/DataTable";
-import { getAppointmentList } from "@/lib/actions/appointment.actions";
 import { auth } from "@/auth";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { getUserByEmail } from "@/lib/actions/user.actions";
+import { getAppointments } from "@/lib/actions/appointment.actions";
 
 const AdminPage = async () => {
-  const appointments = await getAppointmentList();
+  const appointments = await getAppointments();
 
   if (!appointments) {
     return <p>Failed to load appointments. Please try again later.</p>;

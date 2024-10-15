@@ -6,10 +6,10 @@ import { StatCard } from "@/components/StatCard";
 import { columns } from "@/components/table/columns";
 import { DataTable } from "@/components/table/DataTable";
 import { getAppointmentsByDoctorId } from "@/lib/actions/appointment.actions";
-import { User } from "@prisma/client";
+import { ExtendUser } from "@/next-auth";
 
 interface DoctorRegisterFormProps {
-  user: User;
+  user: ExtendUser;
 }
 const DoctorDashboard: React.FC<DoctorRegisterFormProps> = async ({ user }) => {
   const appointments = await getAppointmentsByDoctorId(user.id);
