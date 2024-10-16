@@ -25,7 +25,7 @@ export function SettingsSidebar() {
             href="/settings/theme"
             active={isActive("/settings/theme")}
           >
-            Aparência
+            Tema
           </DashboardSidebarNavLink>
           <DashboardSidebarNavLink
             href="/settings/billing"

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   Card,
@@ -12,12 +14,17 @@ import { Phone, Mail, FileCheck } from "lucide-react";
 import { DoctorDetails } from "@prisma/client";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface DoctorCardProps {
   doctor: DoctorDetails;
 }
 
 export default function DoctorCard({ doctor }: DoctorCardProps) {
+  const route = useRouter();
+  const handleRedirect = () => {
+    route.push(`/agendar-consulta?doctorid=${doctor.id}`);
+  };
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="flex flex-row items-center gap-4">
@@ -66,7 +73,9 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
         )}
       </CardContent>
       <CardFooter>
-        <Button className="w-full">Agendar Consulta</Button>
+        <Button className="w-full" onClick={handleRedirect}>
+          Agendar Consulta
+        </Button>
       </CardFooter>
     </Card>
   );

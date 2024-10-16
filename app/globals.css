@@ -28,9 +28,9 @@
 
 @layer utilities {
   /* ===== UTILITIES */
-  .sidebar {
+  /* .sidebar {
     @apply remove-scrollbar w-full max-w-72 flex-col overflow-auto bg-black-800 px-7 py-10;
-  }
+  } */
 
   .left-sidebar {
     @apply hidden lg:flex;
@@ -291,7 +291,7 @@
 .react-datepicker__day-name,
 .react-datepicker__day,
 .react-datepicker-time__header {
-  @apply dark:bg-[#1a1d21] dark:border-[#363a3d] dark:text-[#abb8c4] text-black !important;
+  @apply dark:bg-[#1a1d21] border-transparent dark:text-[#abb8c4] text-black !important;
 }
 
 .react-datepicker__current-month,

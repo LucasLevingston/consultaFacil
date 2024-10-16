@@ -1,12 +1,12 @@
-"use client";
-
 import Image from "next/image";
 import { AppointmentForm } from "@/components/forms/AppointmentForm";
-import { useSearchParams } from "next/navigation";
+import { getAllDoctors } from "@/lib/actions/doctor.actions";
+import { auth } from "@/auth";
+import { ExtendUser } from "@/next-auth";
 
 const Appointment = async () => {
-  const searchParams = useSearchParams();
-  const doctorId = searchParams.get("doctorid");
+  const session = await auth();
+  const doctors = await getAllDoctors();
 
   return (
     <div className="flex h-screen max-h-screen">
@@ -20,7 +20,11 @@ const Appointment = async () => {
             className="mb-12 h-10 w-fit"
           />
 
-          <AppointmentForm type="create" doctorId={doctorId} />
+          <AppointmentForm
+            type="create"
+            doctors={doctors}
+            user={session?.user as ExtendUser}
+          />
 
           <p className="copyright mt-10 py-12">© 2024 CarePluse</p>
         </div>

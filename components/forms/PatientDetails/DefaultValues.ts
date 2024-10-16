@@ -25,7 +25,6 @@ export const PatientFormDefaultValues = {
 
 export const getDefaultValues = (user: Patient) => {
   const patientDetails = user.patientDetails || {};
-  console.log(patientDetails);
   return {
     name: user.name || PatientFormDefaultValues.name,
     email: user.email || PatientFormDefaultValues.email,

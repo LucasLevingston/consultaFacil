@@ -1,7 +1,8 @@
-import { Gender } from "@prisma/client";
-
-export const GenderOptions = ["male", "female", "other"];
-
+export const GenderOptions = [
+  { label: "Homem", value: "male" },
+  { label: "Mulher", value: "female" },
+  { label: "Outro", value: "other" },
+];
 export const IdentificationTypes = [
   "Birth Certificate",
   "Driver's License",

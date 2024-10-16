@@ -1,8 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -15,37 +15,36 @@ import "react-datepicker/dist/react-datepicker.css";
 import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
 import { Form } from "../ui/form";
-import { getAllDoctors } from "@/lib/actions/doctor.actions";
-import { Appointment, Status } from "@prisma/client";
+import { Appointment, DoctorDetails, Status } from "@prisma/client";
 import { CreateAppointmentParams, UpdateAppointmentParams } from "@/types";
-import { auth } from "@/auth";
+import { ExtendUser } from "@/next-auth";
+import Image from "next/image";
+import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
+import { Phone, Mail, FileCheck, LocateIcon } from "lucide-react";
+import { Button } from "../ui/button";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../ui/card";
+import { getDoctor } from "@/lib/actions/doctor.actions";
+import { Badge } from "../ui/badge";
+import Link from "next/link";
 
 export const AppointmentForm = ({
   type = "create",
   appointment,
   setOpen,
-  doctorId,
+  doctors,
+  user,
 }: {
   type: "create" | "schedule" | "cancel";
   appointment?: Appointment;
   setOpen?: Dispatch<SetStateAction<boolean>>;
-  doctorId?: string | null;
+  doctors: DoctorDetails[];
+  user: ExtendUser;
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [session, setSession] = useState<any>(null); // Ajuste o tipo conforme necessário
-  const [doctors, setDoctors] = useState<any[]>([]); // Ajuste o tipo conforme necessário
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const userSession = await auth();
-      setSession(userSession);
-      const doctorList = await getAllDoctors();
-      setDoctors(doctorList);
-    };
-
-    fetchData();
-  }, []);
+  const searchParams = useSearchParams();
+  const doctorId = searchParams.get("doctorid");
+  const doctor = doctors.find((doctor) => doctor.id === doctorId);
 
   const AppointmentFormValidation = getAppointmentSchema(type);
 
@@ -77,11 +76,11 @@ export const AppointmentForm = ({
 
     try {
       if (type === "create") {
-        if (!session?.user.id) {
+        if (!user.id) {
           throw new Error("User not logged in");
         }
         const newAppointment: CreateAppointmentParams = {
-          patientId: session.user.id,
+          patientId: user.id,
           doctorId: values.doctorId,
           schedule: new Date(values.schedule),
           reason: values.reason ?? undefined,
@@ -92,7 +91,7 @@ export const AppointmentForm = ({
         if (createdAppointment) {
           form.reset();
           router.push(
-            `/patients/${session.user.id}/new-appointment/success?appointmentId=${createdAppointment.id}`
+            `/patients/${user.id}/new-appointment/success?appointmentId=${createdAppointment.id}`
           );
         }
       } else if (type === "schedule" || type === "cancel") {
@@ -145,8 +144,62 @@ export const AppointmentForm = ({
 
         {type !== "cancel" && (
           <>
-            {doctorId ? (
-              <input type="hidden" value={doctorId} {...form.register("doctorId")} />
+            {doctor ? (
+              <Card className="w-full max-w-sm dark:bg-dark-700 shadow-xl">
+                <CardHeader className="flex flex-row items-center gap-4">
+                  <Avatar className="h-16 w-16">
+                    {doctor.imageProfile && (
+                      <AvatarImage
+                        src={doctor.imageProfile}
+                        alt={doctor.name || "Doctor"}
+                        className="rounded-full"
+                      />
+                    )}
+                    <AvatarFallback>
+                      {doctor.name
+                        ? doctor.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                        : "DR"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <Link href={`/profissionais/${doctor.userId}`}>
+                      <CardTitle>Dr. {doctor.name || "Nome não informado"}</CardTitle>
+                    </Link>
+                    <Badge variant="secondary" className="mt-1">
+                      {doctor.specialty || "Especialidade não informada"}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="grid gap-2">
+                  {doctor.phone && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <span>{doctor.phone}</span>
+                    </div>
+                  )}
+                  {doctor.email && (
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      <span>{doctor.email}</span>
+                    </div>
+                  )}
+                  {doctor.licenseNumber && (
+                    <div className="flex items-center gap-2">
+                      <FileCheck className="h-4 w-4 text-muted-foreground" />
+                      <span> {doctor.licenseNumber}</span>
+                    </div>
+                  )}
+                  {doctor.adress && (
+                    <div className="flex items-center gap-2">
+                      <LocateIcon className="h-4 w-4 text-muted-foreground" />
+                      <span>Endereço: {doctor.adress}</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             ) : (
               <CustomFormField
                 fieldType={FormFieldType.SELECT}
@@ -155,13 +208,25 @@ export const AppointmentForm = ({
                 label="Médico"
                 placeholder="Selecione um médico"
               >
-                {doctors?.map((doctor) => (
-                  <SelectItem key={doctor.id} value={doctor.id}>
-                    <div className="flex cursor-pointer items-center gap-2">
-                      <p>{doctor.name}</p>
-                    </div>
-                  </SelectItem>
-                ))}
+                {doctors?.map(
+                  (doctor, i) =>
+                    doctor.name && (
+                      <SelectItem key={i} value={doctor.name}>
+                        <div className="flex cursor-pointer items-center gap-2">
+                          {doctor.imageProfile && (
+                            <Image
+                              src={doctor.imageProfile}
+                              width={32}
+                              height={32}
+                              alt="doctor"
+                              className="rounded-full border border-dark-500"
+                            />
+                          )}
+                          <p>Dr. {doctor.name}</p>
+                        </div>
+                      </SelectItem>
+                    )
+                )}
               </CustomFormField>
             )}
 

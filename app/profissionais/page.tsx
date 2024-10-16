@@ -3,6 +3,7 @@ import DoctorCard from "./_components/doctorCard";
 
 const Home = async () => {
   const doctors = await getAllDoctors();
+
   return (
     <div className="h-full w-full flex flex-col p-12 gap-4">
       <p className="text-2xl font-bold ">

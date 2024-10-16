@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -152,10 +152,10 @@ const PatientDetailsForm = ({ user, type }: PatientDetailsProps) => {
                     defaultValue={field.value}
                   >
                     {GenderOptions.map((option, i) => (
-                      <div key={option + i} className="radio-group">
-                        <RadioGroupItem value={option} id={option} />
-                        <Label htmlFor={option} className="cursor-pointer">
-                          {option}
+                      <div key={option.value + i} className="radio-group">
+                        <RadioGroupItem value={option.value} id={option.value} />
+                        <Label htmlFor={option.value} className="cursor-pointer">
+                          {option.label}
                         </Label>
                       </div>
                     ))}
@@ -164,6 +164,7 @@ const PatientDetailsForm = ({ user, type }: PatientDetailsProps) => {
               )}
             />
           </div>
+
           <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}

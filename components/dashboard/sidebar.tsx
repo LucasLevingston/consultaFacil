@@ -78,7 +78,14 @@ export function DashboardSidebarNavMain({
   className,
   children,
 }: DashboardSidebarGenericProps) {
-  return <main className={cn(["flex flex-col", className])}>{children}</main>;
+  return (
+    <main
+      className={cn(["grid gap-4 text-sm text-muted-foreground", className])}
+      x-chunk="dashboard-04-chunk-0"
+    >
+      {children}
+    </main>
+  );
 }
 
 type DashboardSidebarNavLinkProps = {
@@ -96,7 +103,7 @@ export function DashboardSidebarNavLink({
     <Link
       href={href}
       className={cn([
-        "flex items-center text-xs px-3 py-2 rounded-md ",
+        "flex items-center text-base px-3 py-2 rounded-md ",
         active && "bg-mainColor",
         className,
       ])}

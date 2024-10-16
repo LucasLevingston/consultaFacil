@@ -87,6 +87,8 @@ model DoctorDetails {
   email                     String?
   licenseNumber             String?
   privacyConsent            Boolean?
+  imageProfile String?
+  adress String?
   cpf String?
   identificationDocumentId String?
   identificationDocumentType  String?
@@ -118,6 +120,7 @@ model PatientDetails {
   treatmentConsent Boolean?
   disclosureConsent Boolean?
   cpf String?
+  imageProfile String?
   identificationDocumentId String?
   identificationDocumentType  String?
   identificationDocumentUrl String?

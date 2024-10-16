@@ -40,7 +40,6 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
   });
 
   const onSubmit = async (values: z.infer<typeof DoctorFormValidation>) => {
-    console.log(values);
     setIsLoading(true);
 
     let formData;
