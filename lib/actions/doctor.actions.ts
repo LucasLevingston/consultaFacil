@@ -4,8 +4,7 @@ import { ID, InputFile } from "node-appwrite";
 import { BUCKET_ID, ENDPOINT, PROJECT_ID, storage } from "../appwrite.config";
 import { prisma } from "@/lib/prisma";
 import { getUser } from "./user.actions";
-import { Role } from "@prisma/client";
-import { Doctor, RegisterDoctorParams } from "@/types";
+import { RegisterDoctorParams } from "@/types";
 
 export const registerDoctor = async ({
   identificationDocument,
@@ -27,18 +26,15 @@ export const registerDoctor = async ({
       throw new Error("Error creating file.");
     }
 
-    // Fetch the existing user data
     const user = await getUser(doctor.userId);
     if (!user) {
       throw new Error("User not found.");
     }
 
-    // Check if DoctorDetails already exists
     const existingDoctorDetails = await prisma.doctorDetails.findUnique({
       where: { userId: doctor.userId },
     });
 
-    // Update user and doctor details accordingly
     const newDoctorRecord = await prisma.user.update({
       where: { id: doctor.userId },
       data: {
@@ -46,9 +42,9 @@ export const registerDoctor = async ({
         email: doctor.email || user.email,
         emailVerified: user.emailVerified,
         phone: doctor.phone || user.phone,
-        password: user.password, // Retain existing password
+        password: user.password,
         isDone: true,
-        role: "doctor", // Set role to doctor
+        role: "doctor",
         doctorDetails: existingDoctorDetails
           ? {
               update: {
@@ -85,7 +81,7 @@ export const registerDoctor = async ({
 
 export async function getDoctor(doctorId: string) {
   return await prisma.doctorDetails.findUnique({
-    where: { id: doctorId },
+    where: { userId: doctorId },
   });
 }
 

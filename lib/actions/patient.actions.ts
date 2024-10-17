@@ -98,7 +98,7 @@ export const registerPatient = async ({
 };
 
 export const getPatient = async (patientId: string) => {
-  return await prisma.patientDetails.findUnique({ where: { id: patientId } });
+  return await prisma.patientDetails.findUnique({ where: { userId: patientId } });
 };
 
 export const getPatientByEmail = async (patientEmail: string) => {

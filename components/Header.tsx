@@ -27,6 +27,7 @@ import {
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
 import { SignOut } from "@/lib/actions/user.actions";
 import { Input } from "./ui/input";
+import LogoFull from "./logo/LogoFull";
 
 export async function Header() {
   const session = await auth();
@@ -34,18 +35,7 @@ export async function Header() {
   return (
     <header className="sticky top-0 flex h-16 items-center gap-4 border-b  px-4 md:px-6">
       <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-3 md:text-sm lg:gap-4">
-        <Link className="flex items-center justify-center" href="/">
-          <Button variant="ghost" className="flex gap-2">
-            <Image
-              src="/assets/icons/logo-icon.svg"
-              height={1000}
-              width={1000}
-              alt="patient"
-              className="h-10 w-fit"
-            />
-            <span className="text-lg font-bold">ConsultaFácil</span>
-          </Button>
-        </Link>
+        <LogoFull />
 
         <Link
           href="/"

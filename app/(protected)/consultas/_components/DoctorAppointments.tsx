@@ -1,6 +1,5 @@
-"use client"; // Adicione isso se você estiver usando um componente de cliente
+"use server";
 
-import { useEffect, useState } from "react";
 import { StatCard } from "@/components/StatCard";
 import { columns } from "@/components/table/columns";
 import { DataTable } from "@/components/table/DataTable";
@@ -11,23 +10,8 @@ interface DoctorDashboardProps {
   user: ExtendUser;
 }
 
-const DoctorDashboard: React.FC<DoctorDashboardProps> = ({ user }) => {
-  const [appointments, setAppointments] = useState<any | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      const data = await getAppointmentsByDoctorId(user.id);
-      setAppointments(data);
-      setLoading(false);
-    };
-
-    fetchAppointments();
-  }, [user.id]);
-
-  if (loading) {
-    return <p>Loading appointments...</p>;
-  }
+const DoctorDashboard: React.FC<DoctorDashboardProps> = async ({ user }) => {
+  const appointments = await getAppointmentsByDoctorId(user.id);
 
   if (!appointments) {
     return <p>Failed to load appointments. Please try again later.</p>;

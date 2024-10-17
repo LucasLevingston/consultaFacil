@@ -3,7 +3,7 @@
 import { StatCard } from "@/components/StatCard";
 import { columns } from "@/components/table/columns";
 import { DataTable } from "@/components/table/DataTable";
-import { getAppointmentsByPatientId } from "@/lib/actions/appointment.actions"; // Function to fetch patient's appointments
+import { getAppointmentsByPatientId } from "@/lib/actions/appointment.actions";
 import { ExtendUser } from "@/next-auth";
 
 interface PatientAppointmentsProps {
@@ -23,19 +23,19 @@ const PatientAppointments: React.FC<PatientAppointmentsProps> = async ({ user })
         <StatCard
           type="appointments"
           count={appointments.scheduledCount}
-          label="Scheduled Appointments"
+          label="Consultas marcadas"
           icon={"/assets/icons/appointments.svg"}
         />
         <StatCard
           type="pending"
           count={appointments.pendingCount}
-          label="Pending Appointments"
+          label="Consultas pendentes"
           icon={"/assets/icons/pending.svg"}
         />
         <StatCard
           type="cancelled"
           count={appointments.cancelledCount}
-          label="Cancelled Appointments"
+          label="Consultas canceladas"
           icon={"/assets/icons/cancelled.svg"}
         />
       </section>

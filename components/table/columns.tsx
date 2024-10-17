@@ -1,31 +1,29 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 
-import { Doctors } from "@/constants";
 import { formatDateTime } from "@/lib/utils";
-
 import { AppointmentModal } from "../AppointmentModal";
 import { StatusBadge } from "../StatusBadge";
-import { Appointment } from "@prisma/client";
-import { getPatient } from "@/lib/actions/patient.actions";
-import { getDoctor } from "@/lib/actions/doctor.actions";
+import { CompleteAppointment, Doctor } from "@/types"; // Ensure Doctor type is defined
+import { getAllDoctors } from "@/lib/actions/doctor.actions";
+import { DoctorDetails } from "@prisma/client";
 
-export const columns: ColumnDef<Appointment>[] = [
+export const columns: ColumnDef<CompleteAppointment>[] = [
   {
     header: "#",
     cell: ({ row }) => {
-      return <p className="text-14-medium ">{row.index + 1}</p>;
+      return <p className="text-14-medium">{row.index + 1}</p>;
     },
   },
   {
-    accessorKey: "patientId",
-    header: "Patient",
-    cell: async ({ row }) => {
+    accessorKey: "patient",
+    header: "Paciente",
+    cell: ({ row }) => {
       const appointment = row.original;
-      const patient = await getPatient(appointment.patientId);
-      return <p className="text-14-medium ">{patient?.name}</p>;
+      return <p className="text-14-medium">{appointment.patient.name}</p>;
     },
   },
   {
@@ -42,7 +40,7 @@ export const columns: ColumnDef<Appointment>[] = [
   },
   {
     accessorKey: "schedule",
-    header: "Appointment",
+    header: "Data",
     cell: ({ row }) => {
       const appointment = row.original;
       return (
@@ -54,29 +52,54 @@ export const columns: ColumnDef<Appointment>[] = [
   },
   {
     accessorKey: "primaryPhysician",
-    header: "Doctor",
-    cell: async ({ row }) => {
+    header: "Profissional",
+    cell: ({ row }) => {
       const appointment = row.original;
+      const [doctors, setDoctors] = useState<DoctorDetails[]>([]);
+      const [loading, setLoading] = useState(true);
 
-      const doctor = await getDoctor(appointment.doctorId);
+      useEffect(() => {
+        const fetchDoctors = async () => {
+          try {
+            const fetchedDoctors = await getAllDoctors();
+            setDoctors(fetchedDoctors);
+          } catch (error) {
+            console.error("Failed to fetch doctors:", error);
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        fetchDoctors();
+      }, []);
+
+      const doctor = doctors.find((doctor) => doctor.userId === appointment.doctorId);
 
       return (
         <div className="flex items-center gap-3">
-          {/* <Image
-            src={doctor?.image!}
-            alt="doctor"
-            width={100}
-            height={100}
-            className="size-8"
-          /> */}
-          <p className="whitespace-nowrap">Dr. {doctor?.name}</p>
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            doctor && (
+              <>
+                <Image
+                  src={doctor.imageProfile || "/placeholder.jpg"}
+                  alt="doctor"
+                  width={100}
+                  height={100}
+                  className="size-8"
+                />
+                <p className="whitespace-nowrap">Dr. {doctor.name}</p>
+              </>
+            )
+          )}
         </div>
       );
     },
   },
   {
     id: "actions",
-    header: () => <div className="pl-4">Actions</div>,
+    header: () => <div className="pl-4">Ações</div>,
     cell: ({ row }) => {
       const appointment = row.original;
 
@@ -92,7 +115,7 @@ export const columns: ColumnDef<Appointment>[] = [
           />
           <AppointmentModal
             patientId={appointment.patientId}
-            userId={appointment.doctorId}
+            userId={appointment.patientId}
             appointment={appointment}
             type="cancel"
             title="Cancel Appointment"

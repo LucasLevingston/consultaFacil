@@ -1,31 +1,29 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { SelectItem } from "@/components/ui/select";
 import { createAppointment, updateAppointment } from "@/lib/actions/appointment.actions";
-import { getAppointmentSchema } from "@/lib/validation";
 
 import "react-datepicker/dist/react-datepicker.css";
 
-import CustomFormField, { FormFieldType } from "../CustomFormField";
-import SubmitButton from "../SubmitButton";
-import { Form } from "../ui/form";
+import CustomFormField, { FormFieldType } from "../../CustomFormField";
+import SubmitButton from "../../SubmitButton";
+import { Form } from "../../ui/form";
 import { Appointment, DoctorDetails, Status } from "@prisma/client";
 import { CreateAppointmentParams, UpdateAppointmentParams } from "@/types";
 import { ExtendUser } from "@/next-auth";
 import Image from "next/image";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { Phone, Mail, FileCheck, LocateIcon } from "lucide-react";
-import { Button } from "../ui/button";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../ui/card";
-import { getDoctor } from "@/lib/actions/doctor.actions";
-import { Badge } from "../ui/badge";
+import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
+import { Badge } from "../../ui/badge";
 import Link from "next/link";
+import { getAppointmentSchema } from "./FormValidation";
 
 export const AppointmentForm = ({
   type = "create",
@@ -44,7 +42,7 @@ export const AppointmentForm = ({
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
   const doctorId = searchParams.get("doctorid");
-  const doctor = doctors.find((doctor) => doctor.id === doctorId);
+  const doctor = doctors.find((doctor) => doctor.userId === doctorId);
 
   const AppointmentFormValidation = getAppointmentSchema(type);
 
@@ -56,13 +54,14 @@ export const AppointmentForm = ({
       reason: appointment ? appointment.reason ?? "" : "",
       note: appointment?.note ?? "",
       cancellationReason: "",
+      userId: user.id,
     },
   });
 
   const onSubmit = async (values: z.infer<typeof AppointmentFormValidation>) => {
+    console.log(values);
     setIsLoading(true);
     let status: Status;
-
     switch (type) {
       case "schedule":
         status = "confirmed";
@@ -90,9 +89,7 @@ export const AppointmentForm = ({
         const createdAppointment = await createAppointment(newAppointment);
         if (createdAppointment) {
           form.reset();
-          router.push(
-            `/patients/${user.id}/new-appointment/success?appointmentId=${createdAppointment.id}`
-          );
+          router.push(`/agendar-consulta/success?appointmentId=${createdAppointment.id}`);
         }
       } else if (type === "schedule" || type === "cancel") {
         const appointmentToUpdate: UpdateAppointmentParams = {
@@ -211,7 +208,7 @@ export const AppointmentForm = ({
                 {doctors?.map(
                   (doctor, i) =>
                     doctor.name && (
-                      <SelectItem key={i} value={doctor.name}>
+                      <SelectItem key={i} value={doctor.userId}>
                         <div className="flex cursor-pointer items-center gap-2">
                           {doctor.imageProfile && (
                             <Image

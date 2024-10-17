@@ -1,7 +1,6 @@
-import { Role, Status, PatientDetails, DoctorDetails } from "@prisma/client";
+import { Role, Status, PatientDetails, DoctorDetails, Appointment } from "@prisma/client";
 
 declare type SearchParamProps = {
-  params: { [key: string]: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
@@ -85,4 +84,9 @@ export interface Doctor extends User {
 export interface Patient extends User {
   role: Role;
   patientDetails: PatientDetails;
+}
+
+export interface CompleteAppointment extends Appointment {
+  patient: Patient;
+  doctor: Doctor;
 }

@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { AppointmentForm } from "./forms/AppointmentForm";
+import { AppointmentForm } from "./forms/Appointments/AppointmentForm";
 
 import "react-datepicker/dist/react-datepicker.css";
 import { Appointment } from "@prisma/client";

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { formatDateTime, parseStringify } from "../utils";
+import { parseStringify } from "../utils";
 import { CreateAppointmentParams, UpdateAppointmentParams } from "@/types";
 import { prisma } from "@/lib/prisma";
 
@@ -132,8 +132,7 @@ export const getAppointmentsByDoctorId = async (doctorId: string) => {
 
     return data;
   } catch (error) {
-    console.error("An error occurred while creating a new appointment:", error);
-    throw new Error("Failed to create appointment");
+    throw new Error("Failed to get appointments");
   }
 };
 
@@ -141,6 +140,7 @@ export const getAppointmentsByPatientId = async (patientId: string) => {
   try {
     const appointments = await prisma.appointment.findMany({
       where: { patientId },
+      include: { patient: true, doctor: true },
       orderBy: {
         createdAt: "desc",
       },
@@ -175,7 +175,6 @@ export const getAppointmentsByPatientId = async (patientId: string) => {
 
     return data;
   } catch (error) {
-    console.error("An error occurred while creating a new appointment:", error);
-    throw new Error("Failed to create appointment");
+    throw new Error("Failed to get appointments");
   }
 };

@@ -2,16 +2,18 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { Doctors } from "@/constants";
 import { getAppointment } from "@/lib/actions/appointment.actions";
 import { formatDateTime } from "@/lib/utils";
 import { SearchParamProps } from "@/types";
+import { getAllDoctors, getDoctor } from "@/lib/actions/doctor.actions";
 
-const RequestSuccess = async ({ searchParams, params: { userId } }: SearchParamProps) => {
+const RequestSuccess = async ({ searchParams }: SearchParamProps) => {
   const appointmentId = (searchParams?.appointmentId as string) || "";
   const appointment = await getAppointment(appointmentId);
-
-  const doctor = Doctors.find((doctor) => doctor.name === appointment.primaryPhysician);
+  if (!appointment) {
+    return;
+  }
+  const doctor = await getDoctor(appointment?.doctorId);
 
   return (
     <div className=" flex h-screen max-h-screen px-[5%]">
@@ -27,24 +29,26 @@ const RequestSuccess = async ({ searchParams, params: { userId } }: SearchParamP
         </Link>
 
         <section className="flex flex-col items-center">
-          <Image src="/assets/gifs/success.gif" height={300} width={280} alt="success" />
+          <Image src="/assets/gifs/success.gif" height={300} width={280} alt="sucesso" />
           <h2 className="header mb-6 max-w-[600px] text-center">
-            Your <span className="text-green-500">appointment request</span> has been
-            successfully submitted!
+            Sua <span className="text-green-500">solicitação de consulta</span> foi
+            enviada com sucesso!
           </h2>
-          <p>We&apos;ll be in touch shortly to confirm.</p>
+          <p>Entraremos em contato em breve para confirmar.</p>
         </section>
 
         <section className="request-details">
-          <p>Requested appointment details: </p>
+          <p>Detalhes da solicitação de consulta: </p>
           <div className="flex items-center gap-3">
-            <Image
-              src={doctor?.image!}
-              alt="doctor"
-              width={100}
-              height={100}
-              className="size-6"
-            />
+            {doctor?.imageProfile && (
+              <Image
+                src={doctor?.imageProfile!}
+                alt="médico"
+                width={100}
+                height={100}
+                className="size-6"
+              />
+            )}
             <p className="whitespace-nowrap">Dr. {doctor?.name}</p>
           </div>
           <div className="flex gap-2">
@@ -52,14 +56,14 @@ const RequestSuccess = async ({ searchParams, params: { userId } }: SearchParamP
               src="/assets/icons/calendar.svg"
               height={24}
               width={24}
-              alt="calendar"
+              alt="calendário"
             />
-            <p> {formatDateTime(appointment.schedule).dateTime}</p>
+            {appointment && <p> {formatDateTime(appointment.schedule).dateTime}</p>}
           </div>
         </section>
 
         <Button variant="outline" className="shad-primary-btn" asChild>
-          <Link href={`/patients/${userId}/new-appointment`}>New Appointment</Link>
+          <Link href={`/agendar-consulta`}>Nova Consulta</Link>
         </Button>
 
         <p className="copyright">© 2024 CarePluse</p>
