@@ -87,11 +87,14 @@ model DoctorDetails {
   licenseNumber             String?
   privacyConsent            Boolean?
   imageProfile String?
-  adress String?
   cpf String?
   identificationDocumentId String?
   identificationDocumentType  String?
   identificationDocumentUrl String?
+  birthDate DateTime?
+  gender Gender?
+  address                   String?
+
 
 
   user User @relation(fields: [userId], references: [id])

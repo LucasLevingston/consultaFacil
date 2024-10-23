@@ -28,12 +28,12 @@ export const PatientFormValidation = z.object({
   //   (emergencyContactNumber) => /^\+\d{10,15}$/.test(emergencyContactNumber),
   //   "Invalid phone number"
   // )
-  allergies: z.string().optional(),
-  currentMedication: z.string().optional(),
-  familyMedicalHistory: z.string().optional(),
-  pastMedicalHistory: z.string().optional(),
-  identificationType: z.string().optional(),
-  cpf: z.string().optional(),
+  allergies: z.string(),
+  currentMedication: z.string(),
+  familyMedicalHistory: z.string(),
+  pastMedicalHistory: z.string(),
+  identificationDocumentType: z.string(),
+  cpf: z.string(),
   identificationDocument: z.custom<File[]>().optional(),
   treatmentConsent: z
     .boolean()

@@ -23,6 +23,9 @@ import { Patient, RegisterPatientParams } from "@/types";
 import { getDefaultValues, PatientFormDefaultValues } from "./DefaultValues";
 import { PatientFormValidation } from "./FormValidation";
 import { toast } from "@/hooks/use-toast";
+import { updateUser } from "@/lib/actions/user.actions";
+import { PatientDetails } from "@prisma/client";
+import image from "next/image";
 
 interface PatientDetailsProps {
   user: Patient;
@@ -56,36 +59,50 @@ const PatientDetailsForm = ({ user, type }: PatientDetailsProps) => {
     }
 
     try {
-      const patient: RegisterPatientParams = {
-        userId: user.id,
-        name: values.name,
-        email: values.email,
-        phone: values.phone,
-        birthDate: new Date(values.birthDate),
-        gender: values.gender,
-        address: values.address,
-        occupation: values.occupation,
-        emergencyContactName: values.emergencyContactName,
-        emergencyContactNumber: values.emergencyContactNumber,
-        allergies: values.allergies,
-        currentMedication: values.currentMedication,
-        familyMedicalHistory: values.familyMedicalHistory,
-        pastMedicalHistory: values.pastMedicalHistory,
-        identificationType: values.identificationType,
-        cpf: values.cpf,
-        identificationDocument: values.identificationDocument ? formData : undefined,
-        privacyConsent: values.privacyConsent,
-        password: user.password ? user.password : "",
+      const patient: Patient = {
+        id: user.id,
+        emailVerified: user.emailVerified,
+        isDone: user.isDone,
         role: user.role,
+        image: user.image,
+        password: user.password,
+        patientDetails: {
+          userId: user.id,
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          birthDate: new Date(values.birthDate),
+          gender: values.gender,
+          address: values.address,
+          occupation: values.occupation,
+          emergencyContactName: values.emergencyContactName,
+          emergencyContactNumber: values.emergencyContactNumber,
+          allergies: values.allergies || "",
+          currentMedication: values.currentMedication || "",
+          familyMedicalHistory: values.familyMedicalHistory || "",
+          pastMedicalHistory: values.pastMedicalHistory || "",
+          cpf: values.cpf,
+          treatmentConsent: values.disclosureConsent,
+          disclosureConsent: values.disclosureConsent,
+          privacyConsent: values.privacyConsent,
+          identificationDocumentType: values.identificationDocumentType,
+          identificationDocumentId: user.patientDetails?.identificationDocumentId || null,
+          identificationDocumentUrl:
+            user.patientDetails?.identificationDocumentUrl || null,
+          imageProfile: "",
+        },
       };
-
-      const newPatient = await registerPatient(patient);
-
+      const newPatient = await registerPatient({
+        ...patient,
+        identificationDocument: values.identificationDocument ? formData : undefined,
+      });
       if (newPatient) {
         toast({ title: "Dados salvos com sucesso!" });
-        setTimeout(() => {
-          router.push(`/`);
-        }, 1000);
+        if (type === "create") {
+          setTimeout(() => {
+            router.push(`/`);
+          }, 1000);
+        }
       }
     } catch (error) {
       console.log(error);

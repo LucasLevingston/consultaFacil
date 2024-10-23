@@ -85,7 +85,6 @@ export const UserForm = () => {
       });
 
       toast({ title: "Login feito com sucesso!" });
-
       if (response) {
         setTimeout(() => {
           if (response) {

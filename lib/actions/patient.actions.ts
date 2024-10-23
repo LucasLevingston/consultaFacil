@@ -5,6 +5,7 @@ import { BUCKET_ID, ENDPOINT, PROJECT_ID, storage } from "../appwrite.config";
 import { prisma } from "@/lib/prisma";
 import { RegisterPatientParams } from "@/types";
 import { getUser } from "./user.actions";
+import { User } from "lucide-react";
 
 export const registerPatient = async ({
   identificationDocument,
@@ -12,31 +13,31 @@ export const registerPatient = async ({
 }: RegisterPatientParams) => {
   try {
     let file;
+    const existingPatientDetails = await prisma.patientDetails.findUnique({
+      where: { userId: patient.id },
+    });
+    if (!existingPatientDetails) {
+      if (identificationDocument) {
+        const inputFile = InputFile.fromBlob(
+          identificationDocument.get("blobFile") as Blob,
+          identificationDocument.get("fileName") as string
+        );
 
-    if (identificationDocument) {
-      const inputFile = InputFile.fromBlob(
-        identificationDocument.get("blobFile") as Blob,
-        identificationDocument.get("fileName") as string
-      );
+        file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
+      }
 
-      file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
+      if (!file) {
+        throw new Error("Error creating file.");
+      }
     }
 
-    if (!file) {
-      throw new Error("Error creating file.");
-    }
-
-    const user = await getUser(patient.userId);
+    const user = await getUser(patient.id);
     if (!user) {
       throw new Error("User not found.");
     }
 
-    const existingPatientDetails = await prisma.patientDetails.findUnique({
-      where: { userId: patient.userId },
-    });
-
     const newPatientRecord = await prisma.user.update({
-      where: { id: patient.userId },
+      where: { id: patient.id },
       data: {
         name: patient.name || user.name,
         email: patient.email || user.email,
@@ -49,48 +50,52 @@ export const registerPatient = async ({
         patientDetails: existingPatientDetails
           ? {
               update: {
-                identificationDocumentId: file.$id || null,
-                identificationDocumentUrl: file.$id
-                  ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}`
-                  : null,
-                birthDate: patient.birthDate,
-                gender: patient.gender,
-                address: patient.address,
-                occupation: patient.occupation,
-                emergencyContactName: patient.emergencyContactName,
-                emergencyContactNumber: patient.emergencyContactNumber,
-                allergies: patient.allergies,
-                currentMedication: patient.currentMedication,
-                familyMedicalHistory: patient.familyMedicalHistory,
-                pastMedicalHistory: patient.pastMedicalHistory,
-                privacyConsent: patient.privacyConsent,
+                birthDate: patient.patientDetails.birthDate,
+                gender: patient.patientDetails.gender,
+                address: patient.patientDetails.address,
+                occupation: patient.patientDetails.occupation,
+                emergencyContactName: patient.patientDetails.emergencyContactName,
+                emergencyContactNumber: patient.patientDetails.emergencyContactNumber,
+                allergies: patient.patientDetails.allergies,
+                currentMedication: patient.patientDetails.currentMedication,
+                familyMedicalHistory: patient.patientDetails.familyMedicalHistory,
+                pastMedicalHistory: patient.patientDetails.pastMedicalHistory,
+                privacyConsent: patient.patientDetails.privacyConsent,
+                cpf: patient.patientDetails.cpf,
+                disclosureConsent: patient.patientDetails.disclosureConsent,
+                treatmentConsent: patient.patientDetails.treatmentConsent,
+                email: patient.patientDetails.email,
+                phone: patient.patientDetails.phone,
+                name: patient.patientDetails.name,
               },
             }
           : {
               create: {
-                name: user.name,
-                phone: user.phone,
-                email: user.email,
-                identificationDocumentId: file.$id || null,
-                identificationDocumentUrl: file.$id
+                name: patient.patientDetails.name || user.name,
+                email: patient.patientDetails.email || user.email,
+                phone: patient.patientDetails.phone || user.phone,
+                birthDate: patient.patientDetails.birthDate,
+                gender: patient.patientDetails.gender,
+                address: patient.patientDetails.address,
+                occupation: patient.patientDetails.occupation,
+                emergencyContactName: patient.patientDetails.emergencyContactName,
+                emergencyContactNumber: patient.patientDetails.emergencyContactNumber,
+                allergies: patient.patientDetails.allergies,
+                currentMedication: patient.patientDetails.currentMedication,
+                familyMedicalHistory: patient.patientDetails.familyMedicalHistory,
+                pastMedicalHistory: patient.patientDetails.pastMedicalHistory,
+                privacyConsent: patient.patientDetails.privacyConsent,
+                cpf: patient.patientDetails.cpf,
+                disclosureConsent: patient.patientDetails.disclosureConsent,
+                treatmentConsent: patient.patientDetails.treatmentConsent,
+                identificationDocumentId: file?.$id || null,
+                identificationDocumentUrl: file?.$id
                   ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}`
                   : null,
-                birthDate: patient.birthDate,
-                gender: patient.gender,
-                address: patient.address,
-                occupation: patient.occupation,
-                emergencyContactName: patient.emergencyContactName,
-                emergencyContactNumber: patient.emergencyContactNumber,
-                allergies: patient.allergies,
-                currentMedication: patient.currentMedication,
-                familyMedicalHistory: patient.familyMedicalHistory,
-                pastMedicalHistory: patient.pastMedicalHistory,
-                privacyConsent: patient.privacyConsent,
               },
             },
       },
     });
-
     return newPatientRecord;
   } catch (error: any) {
     throw new Error(error);

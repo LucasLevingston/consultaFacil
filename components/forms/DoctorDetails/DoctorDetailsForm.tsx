@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { Form, FormControl } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
-import { IdentificationTypes } from "@/constants";
+import { GenderOptions, IdentificationTypes } from "@/constants";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "react-phone-number-input/style.css";
@@ -22,6 +22,8 @@ import { getDefaultValues } from "./DefaultValues";
 import { DoctorFormValidation } from "./FormValidation";
 import { ExtendUser } from "@/next-auth";
 import { toast } from "@/hooks/use-toast";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 interface DoctorDetailsProps {
   user: ExtendUser;
@@ -55,28 +57,44 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
     }
 
     try {
-      const doctor: RegisterDoctorParams = {
-        userId: user.id,
-        name: values.name,
-        email: values.email,
-        phone: values.phone,
-        specialty: values.specialty,
-        licenseNumber: values.licenseNumber,
-        identificationType: values.identificationType,
-        cpf: values.cpf,
-        identificationDocument: values.identificationDocument ? formData : undefined,
-        privacyConsent: values.privacyConsent,
-        password: user.password ? user.password : "",
+      const doctor: Doctor = {
+        id: user.id,
+        emailVerified: user.emailVerified,
+        isDone: user.isDone,
         role: user.role,
+        image: user.image,
+        password: user.password,
+        doctorDetails: {
+          userId: user.id,
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          birthDate: new Date(values.birthDate),
+          specialty: values.specialty,
+          licenseNumber: values.licenseNumber,
+          identificationDocumentType: values.identificationDocumentType,
+          identificationDocumentId: user.patientDetails?.identificationDocumentId || null,
+          identificationDocumentUrl:
+            user.patientDetails?.identificationDocumentUrl || null,
+          cpf: values.cpf,
+          privacyConsent: values.privacyConsent,
+          address: values.address,
+          imageProfile: "",
+          gender: values.gender,
+        },
       };
 
-      const newDoctor = await registerDoctor(doctor);
-
+      const newDoctor = await registerDoctor({
+        ...doctor,
+        identificationDocument: values.identificationDocument ? formData : undefined,
+      });
       if (newDoctor) {
         toast({ title: "Dados salvos com sucesso!" });
-        setTimeout(() => {
-          router.push(`/`);
-        }, 1000);
+        if (type === "create") {
+          setTimeout(() => {
+            router.push(`/`);
+          }, 1000);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -123,12 +141,52 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
               placeholder="(555) 123-4567"
             />
           </div>
+          <div className="flex flex-col gap-6 xl:flex-row">
+            <CustomFormField
+              fieldType={FormFieldType.DATE_PICKER}
+              control={form.control}
+              name="birthDate"
+              label="Data de Nascimento"
+            />
+
+            <CustomFormField
+              fieldType={FormFieldType.SKELETON}
+              control={form.control}
+              name="gender"
+              label="Gênero"
+              renderSkeleton={(field) => (
+                <FormControl>
+                  <RadioGroup
+                    className="flex h-11 gap-6 xl:justify-between"
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    {GenderOptions.map((option, i) => (
+                      <div key={option.value + i} className="radio-group">
+                        <RadioGroupItem value={option.value} id={option.value} />
+                        <Label htmlFor={option.value} className="cursor-pointer">
+                          {option.label}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+              )}
+            />
+          </div>
           <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
             name="cpf"
             label="CPF"
             placeholder="123456789"
+          />
+          <CustomFormField
+            fieldType={FormFieldType.INPUT}
+            control={form.control}
+            name="adress"
+            label="Endereço"
+            placeholder="Rua visconde neto 35 - Patos, PB"
           />
           {/* ESPECIALIDADE & NÚMERO DA LICENÇA */}
           <div className="flex flex-col gap-6 xl:flex-row">

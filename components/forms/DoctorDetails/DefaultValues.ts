@@ -1,4 +1,4 @@
-import { Doctor } from "@/types";
+import { Doctor, Gender } from "@/types";
 
 export const DoctorFormDefaultValues = {
   userId: "",
@@ -6,13 +6,16 @@ export const DoctorFormDefaultValues = {
   email: "",
   phone: "",
   specialty: "",
+  gender: "male" as Gender,
   licenseNumber: "",
+  birthDate: new Date(Date.now()),
   identificationDocumentType: "",
   cpf: "",
   identificationDocument: undefined,
   privacyConsent: false,
   password: "",
   role: "doctor",
+  address: "",
 };
 
 export const getDefaultValues = (user: Doctor) => {
@@ -23,6 +26,8 @@ export const getDefaultValues = (user: Doctor) => {
     name: user.name ?? DoctorFormDefaultValues.name,
     email: user.email ?? DoctorFormDefaultValues.email,
     phone: user.phone ?? DoctorFormDefaultValues.phone,
+    gender: doctorDetails.gender || DoctorFormDefaultValues.gender,
+    birthDate: doctorDetails.birthDate || DoctorFormDefaultValues.birthDate,
     specialty: doctorDetails.specialty ?? DoctorFormDefaultValues.specialty,
     licenseNumber: doctorDetails.licenseNumber ?? DoctorFormDefaultValues.licenseNumber,
     identificationDocumentType:
@@ -34,5 +39,6 @@ export const getDefaultValues = (user: Doctor) => {
       doctorDetails.privacyConsent ?? DoctorFormDefaultValues.privacyConsent,
     password: user.password ?? DoctorFormDefaultValues.password,
     role: user.role ?? DoctorFormDefaultValues.role,
+    address: user.doctorDetails.address ?? DoctorFormDefaultValues.address,
   };
 };

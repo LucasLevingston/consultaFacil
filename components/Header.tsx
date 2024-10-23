@@ -127,7 +127,7 @@ export async function Header() {
               <DropdownMenuItem asChild>
                 <Link href="/auth" className="flex items-center">
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Criar conta</span>
+                  <span>Logar ou criar conta</span>
                 </Link>
               </DropdownMenuItem>
             )}

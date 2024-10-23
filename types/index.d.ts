@@ -14,22 +14,8 @@ declare interface CreateUserParams {
   role: "doctor" | "patient" | "admin";
 }
 
-declare interface RegisterPatientParams extends CreateUserParams {
-  userId: string;
-  birthDate: Date;
-  gender: Gender;
-  address: string;
-  occupation: string;
-  emergencyContactName: string;
-  emergencyContactNumber: string;
-  allergies?: string; // Use optional instead of undefined
-  currentMedication?: string; // Use optional instead of undefined
-  familyMedicalHistory?: string; // Use optional instead of undefined
-  pastMedicalHistory?: string; // Use optional instead of undefined
-  identificationType?: string; // Use optional instead of undefined
-  cpf?: string; // Use optional instead of undefined
-  identificationDocument?: FormData; // Use optional instead of undefined
-  privacyConsent: boolean;
+declare interface RegisterPatientParams extends Patient {
+  identificationDocument?: FormData;
 }
 
 declare type CreateAppointmentParams = {
@@ -51,20 +37,10 @@ declare type UpdateAppointmentParams = {
   type: "schedule" | "cancel"; // Use tipos literais
 };
 
-export interface RegisterDoctorParams extends CreateUserParams {
-  userId: string;
-  name: string;
-  email: string;
-  phone: string;
-  specialty?: string;
-  licenseNumber?: string;
-  identificationType: string;
-  cpf: string;
+export interface RegisterDoctorParams extends Doctor {
   identificationDocument?: FormData;
-  privacyConsent: boolean;
-  password: string;
-  role: string;
 }
+
 export interface User {
   name?: string | null;
   id: string;

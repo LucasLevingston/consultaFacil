@@ -13,31 +13,32 @@ export const registerDoctor = async ({
   try {
     let file;
 
-    if (identificationDocument) {
-      const inputFile = InputFile.fromBlob(
-        identificationDocument.get("blobFile") as Blob,
-        identificationDocument.get("fileName") as string
-      );
+    const existingDoctorDetails = await prisma.doctorDetails.findUnique({
+      where: { userId: doctor.id },
+    });
+    if (existingDoctorDetails) {
+      if (identificationDocument) {
+        const inputFile = InputFile.fromBlob(
+          identificationDocument.get("blobFile") as Blob,
+          identificationDocument.get("fileName") as string
+        );
 
-      file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
+        file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
+      }
+
+      if (!file) {
+        throw new Error("Error creating file.");
+      }
     }
 
-    if (!file) {
-      throw new Error("Error creating file.");
-    }
-
-    const user = await getUser(doctor.userId);
+    const user = await getUser(doctor.id);
     if (!user) {
       console.log(doctor);
       throw new Error("User not found.");
     }
 
-    const existingDoctorDetails = await prisma.doctorDetails.findUnique({
-      where: { userId: doctor.userId },
-    });
-
     const newDoctorRecord = await prisma.user.update({
-      where: { id: doctor.userId },
+      where: { id: doctor.id },
       data: {
         name: doctor.name || user.name,
         email: doctor.email || user.email,
@@ -49,12 +50,16 @@ export const registerDoctor = async ({
         doctorDetails: existingDoctorDetails
           ? {
               update: {
-                licenseNumber: doctor.licenseNumber || null,
-                identificationDocumentId: file.$id || null,
-                identificationDocumentUrl: file.$id
-                  ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}`
-                  : null,
-                specialty: doctor.specialty,
+                licenseNumber: doctor.doctorDetails.licenseNumber || null,
+                specialty: doctor.doctorDetails.specialty,
+                birthDate: doctor.doctorDetails.birthDate,
+                gender: doctor.doctorDetails.gender,
+                address: doctor.doctorDetails.address,
+                privacyConsent: doctor.doctorDetails.privacyConsent,
+                cpf: doctor.doctorDetails.cpf,
+                email: doctor.doctorDetails.email,
+                phone: doctor.doctorDetails.phone,
+                name: doctor.doctorDetails.name,
               },
             }
           : {
@@ -62,15 +67,16 @@ export const registerDoctor = async ({
                 email: user.email,
                 phone: user.phone,
                 name: user.name,
-                cpf: doctor.cpf,
-                adress: doctor.cpf,
-                identificationDocumentType: doctor.identificationType,
-                licenseNumber: doctor.licenseNumber || null,
-                identificationDocumentId: file.$id || null,
-                identificationDocumentUrl: file.$id
+                cpf: doctor.doctorDetails.cpf,
+                address: doctor.doctorDetails.cpf,
+                identificationDocumentType:
+                  doctor.doctorDetails.identificationDocumentType,
+                licenseNumber: doctor.doctorDetails.licenseNumber || null,
+                identificationDocumentId: file?.$id || null,
+                identificationDocumentUrl: file?.$id
                   ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}`
                   : null,
-                specialty: doctor.specialty,
+                specialty: doctor.doctorDetails.specialty,
               },
             },
       },

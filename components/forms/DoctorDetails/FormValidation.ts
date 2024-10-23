@@ -15,4 +15,11 @@ export const DoctorFormValidation = z.object({
   }),
   password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres."),
   role: z.string().default("doctor"),
+  address: z
+    .string()
+    .min(5, "Address must be at least 5 characters")
+    .max(500, "Address must be at most 500 characters"),
+  birthDate: z.coerce.date(),
+  identificationDocumentType: z.string(),
+  gender: z.enum(["male", "female", "other"]),
 });
