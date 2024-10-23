@@ -134,7 +134,7 @@ model Appointment {
   schedule           DateTime
   reason             String?
   note               String?
-  status             Status   @default(pending)
+  status             Status   @default(scheduled)
   patientId          String
   doctorId           String
   cancellationReason String?
@@ -145,9 +145,10 @@ model Appointment {
 }
 
 enum Status {
+  scheduled
   pending
-  confirmed
   canceled
+  finalized
 }
 
 enum Gender {

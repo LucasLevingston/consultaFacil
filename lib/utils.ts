@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import bcrypt from "bcryptjs";
+import { CompleteAppointment } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -22,7 +23,7 @@ export const formatDateTime = (
     year: "numeric", // numeric year (e.g., '2023')
     hour: "numeric", // numeric hour (e.g., '8')
     minute: "numeric", // numeric minute (e.g., '30')
-    hour12: true, // use 12-hour clock (true) or 24-hour clock (false),
+    hour12: false, // use 12-hour clock (true) or 24-hour clock (false),
     timeZone: timeZone, // use the provided timezone
   };
 
@@ -31,7 +32,8 @@ export const formatDateTime = (
     year: "numeric", // numeric year (e.g., '2023')
     month: "2-digit", // abbreviated month name (e.g., 'Oct')
     day: "2-digit", // numeric day of the month (e.g., '25')
-    timeZone: timeZone, // use the provided timezone
+    timeZone: timeZone,
+    hour12: false, // use the provided timezone
   };
 
   const dateOptions: Intl.DateTimeFormatOptions = {
@@ -49,18 +51,18 @@ export const formatDateTime = (
   };
 
   const formattedDateTime: string = new Date(dateString).toLocaleString(
-    "en-US",
+    "pt-BR",
     dateTimeOptions
   );
 
   const formattedDateDay: string = new Date(dateString).toLocaleString(
-    "en-US",
+    "pt-BR",
     dateDayOptions
   );
 
-  const formattedDate: string = new Date(dateString).toLocaleString("en-US", dateOptions);
+  const formattedDate: string = new Date(dateString).toLocaleString("pt-BR", dateOptions);
 
-  const formattedTime: string = new Date(dateString).toLocaleString("en-US", timeOptions);
+  const formattedTime: string = new Date(dateString).toLocaleString("pt-BR", timeOptions);
 
   return {
     dateTime: formattedDateTime,
@@ -84,4 +86,39 @@ export async function hashPassword(password: string) {
 }
 export async function comparePassword(password: string, userPassword: string) {
   return await bcrypt.compare(password, userPassword);
+}
+
+export function countAppointments(appointments: CompleteAppointment[]) {
+  const initialCounts = {
+    scheduledCount: 0,
+    pendingCount: 0,
+    cancelledCount: 0,
+    finalizedCount: 0,
+  };
+
+  const counts = appointments.reduce((acc, appointment) => {
+    switch (appointment.status) {
+      case "scheduled":
+        acc.scheduledCount++;
+        break;
+      case "pending":
+        acc.pendingCount++;
+        break;
+      case "finalized":
+        acc.finalizedCount++;
+        break;
+      case "canceled":
+        acc.cancelledCount++;
+        break;
+    }
+    return acc;
+  }, initialCounts);
+
+  const data = {
+    totalCount: appointments.length,
+    ...counts,
+    documents: appointments,
+  };
+
+  return data;
 }

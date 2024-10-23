@@ -20,31 +20,20 @@ export const getUserByEmail = async (email: string) => {
 };
 
 export async function createUser(user: CreateUserParams) {
-  try {
-    const result: SignInResponse | undefined = await signIn("credentials", {
-      redirect: false,
-      email: user.email,
-      password: user.password,
-      phone: user.phone,
-      role: user.role,
-      name: user.name,
-    });
+  const hashedPassword = await hashPassword(user.password);
 
-    if (result?.error) {
-      throw new Error(result.error);
-    }
+  const doesEmailExist = await prisma.user.findUnique({
+    where: { email: user.email },
+  });
 
-    const newUser = await getUserByEmail(user.email);
-    return newUser
-      ? {
-          id: newUser.id,
-          email: newUser.email,
-          role: newUser.role,
-        }
-      : null;
-  } catch (error: any) {
-    return { error: error.message || "An unknown error occurred" };
+  if (doesEmailExist) {
+    throw new Error("Email already exists");
   }
+
+  const createAccount = await prisma.user.create({
+    data: { ...user, password: hashedPassword },
+  });
+  return createAccount;
 }
 
 export const registerUser = async (formData: CreateUserParams) => {
@@ -61,41 +50,34 @@ export const registerUser = async (formData: CreateUserParams) => {
       },
     });
     return newUser;
-  } catch (error) {
-    console.error("Error creating user:", error);
-    throw new Error("User registration failed.");
+  } catch (error: any) {
+    throw new Error(error.message);
   }
 };
 
 export const signInWithCreds = async (data: { email: string; password: string }) => {
-  const existingUser = await getUserByEmail(data.email);
-  if (!existingUser) {
-    return { error: "User not found." };
-  }
-  if (!existingUser || !existingUser.password) return null;
-
-  const passwordMatch = await bcrypt.compare(data.password, existingUser.password);
-
-  if (!passwordMatch) return { error: "Invalid credentials!" };
   try {
-    await signIn("credentials", {
+    const existingUser = await getUserByEmail(data.email);
+    if (!existingUser) {
+      throw new Error("User not found.");
+    }
+    if (!existingUser.password) throw new Error("Password not defined!");
+
+    const hashedPassword = await hashPassword(data.password);
+    const passwordMatch = await bcrypt.compare(hashedPassword, existingUser.password);
+
+    if (!passwordMatch) throw new Error("Invalid credentials!");
+
+    const result = await signIn("credentials", {
       email: data.email,
       password: data.password,
-      redirectTo: "/",
+      // redirectTo: "/",
     });
+
     const user = await getUserByEmail(data.email);
     return user;
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CredentialsSignin":
-          return { error: "Invalid credentials!" };
-        default:
-          return { error: "Something went wrong!" };
-      }
-    }
-
-    throw error;
+  } catch (error: any) {
+    throw new Error(error.message);
   }
 };
 
@@ -104,7 +86,7 @@ export const signInWithGoogle = async () => {
 };
 
 export const SignOut = async () => {
-  await signOut({ redirectTo: "/" });
+  return await signOut({ redirectTo: "/" });
 };
 
 export const getUser = async (userId: string) => {

@@ -21,6 +21,7 @@ import SubmitButton from "@/components/SubmitButton";
 import { getDefaultValues } from "./DefaultValues";
 import { DoctorFormValidation } from "./FormValidation";
 import { ExtendUser } from "@/next-auth";
+import { toast } from "@/hooks/use-toast";
 
 interface DoctorDetailsProps {
   user: ExtendUser;
@@ -70,8 +71,12 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
       };
 
       const newDoctor = await registerDoctor(doctor);
+
       if (newDoctor) {
-        router.push(`/doctors/${user.id}/appointments`);
+        toast({ title: "Dados salvos com sucesso!" });
+        setTimeout(() => {
+          router.push(`/`);
+        }, 1000);
       }
     } catch (error) {
       console.log(error);

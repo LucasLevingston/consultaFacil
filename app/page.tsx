@@ -24,14 +24,14 @@ export default function Home() {
               <h1 className="text-3xl  font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
                 Agende suas consultas com facilidade
               </h1>
-              <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
+              <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-200">
                 ConsultaFácil torna o agendamento de consultas médicas simples e rápido.
                 Escolha seu médico, data e horário em poucos cliques.
               </p>
             </div>
             <div className="space-x-4">
               <Button
-                className="b font-bold border-white"
+                className=" font-bold border-white"
                 variant="outline"
                 onClick={handleRedirect}
               >

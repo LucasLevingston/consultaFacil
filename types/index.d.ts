@@ -87,6 +87,15 @@ export interface Patient extends User {
 }
 
 export interface CompleteAppointment extends Appointment {
-  patient: Patient;
-  doctor: Doctor;
+  patient: PatientDetails;
+  doctor: DoctorDetails;
+}
+
+export interface AppointmentCount {
+  documents: CompleteAppointment[];
+  scheduledCount: number;
+  pendingCount: number;
+  cancelledCount: number;
+  finalizedCount: number;
+  totalCount: number;
 }

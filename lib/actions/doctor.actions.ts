@@ -28,6 +28,7 @@ export const registerDoctor = async ({
 
     const user = await getUser(doctor.userId);
     if (!user) {
+      console.log(doctor);
       throw new Error("User not found.");
     }
 
@@ -61,6 +62,9 @@ export const registerDoctor = async ({
                 email: user.email,
                 phone: user.phone,
                 name: user.name,
+                cpf: doctor.cpf,
+                adress: doctor.cpf,
+                identificationDocumentType: doctor.identificationType,
                 licenseNumber: doctor.licenseNumber || null,
                 identificationDocumentId: file.$id || null,
                 identificationDocumentUrl: file.$id

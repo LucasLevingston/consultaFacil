@@ -2,8 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 
-import { parseStringify } from "../utils";
-import { CreateAppointmentParams, UpdateAppointmentParams } from "@/types";
+import { countAppointments, parseStringify } from "../utils";
+import {
+  AppointmentCount,
+  CreateAppointmentParams,
+  UpdateAppointmentParams,
+} from "@/types";
 import { prisma } from "@/lib/prisma";
 
 export const createAppointment = async (appointment: CreateAppointmentParams) => {
@@ -18,36 +22,11 @@ export const getAppointments = async () => {
       orderBy: {
         createdAt: "desc",
       },
+      include: { patient: true, doctor: true },
     });
 
-    const initialCounts = {
-      scheduledCount: 0,
-      pendingCount: 0,
-      cancelledCount: 0,
-    };
-
-    const counts = appointments.reduce((acc, appointment) => {
-      switch (appointment.status) {
-        case "confirmed":
-          acc.scheduledCount++;
-          break;
-        case "pending":
-          acc.pendingCount++;
-          break;
-        case "canceled":
-          acc.cancelledCount++;
-          break;
-      }
-      return acc;
-    }, initialCounts);
-
-    const data = {
-      totalCount: appointments.length,
-      ...counts,
-      documents: appointments,
-    };
-
-    return data;
+    const appointmentCount: AppointmentCount = countAppointments(appointments);
+    return appointmentCount;
   } catch (error) {
     console.error("An error occurred while creating a new appointment:", error);
     throw new Error("Failed to create appointment");
@@ -98,39 +77,13 @@ export const getAppointmentsByDoctorId = async (doctorId: string) => {
   try {
     const appointments = await prisma.appointment.findMany({
       where: { doctorId },
+      include: { doctor: true, patient: true },
       orderBy: {
         createdAt: "desc",
       },
     });
-
-    const initialCounts = {
-      scheduledCount: 0,
-      pendingCount: 0,
-      cancelledCount: 0,
-    };
-
-    const counts = appointments.reduce((acc, appointment) => {
-      switch (appointment.status) {
-        case "confirmed":
-          acc.scheduledCount++;
-          break;
-        case "pending":
-          acc.pendingCount++;
-          break;
-        case "canceled":
-          acc.cancelledCount++;
-          break;
-      }
-      return acc;
-    }, initialCounts);
-
-    const data = {
-      totalCount: appointments.length,
-      ...counts,
-      documents: appointments,
-    };
-
-    return data;
+    const appointmentCount: AppointmentCount = countAppointments(appointments);
+    return appointmentCount;
   } catch (error) {
     throw new Error("Failed to get appointments");
   }
@@ -146,34 +99,8 @@ export const getAppointmentsByPatientId = async (patientId: string) => {
       },
     });
 
-    const initialCounts = {
-      scheduledCount: 0,
-      pendingCount: 0,
-      cancelledCount: 0,
-    };
-
-    const counts = appointments.reduce((acc, appointment) => {
-      switch (appointment.status) {
-        case "confirmed":
-          acc.scheduledCount++;
-          break;
-        case "pending":
-          acc.pendingCount++;
-          break;
-        case "canceled":
-          acc.cancelledCount++;
-          break;
-      }
-      return acc;
-    }, initialCounts);
-
-    const data = {
-      totalCount: appointments.length,
-      ...counts,
-      documents: appointments,
-    };
-
-    return data;
+    const appointmentCount: AppointmentCount = countAppointments(appointments);
+    return appointmentCount;
   } catch (error) {
     throw new Error("Failed to get appointments");
   }

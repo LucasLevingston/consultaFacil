@@ -12,10 +12,15 @@ import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
 import { SelectItem } from "../ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { signInWithCreds, signInWithGoogle } from "@/lib/actions/user.actions";
+import {
+  createUser,
+  signInWithCreds,
+  signInWithGoogle,
+} from "@/lib/actions/user.actions";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "../ui/button";
 import { FcGoogle } from "react-icons/fc";
+import router from "next/router";
 export const UserForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -41,56 +46,73 @@ export const UserForm = () => {
 
   const onRegisterSubmit = async (values: z.infer<typeof UserFormValidation>) => {
     setIsLoading(true);
-    const response = await fetch(`/api/auth/create`, {
-      method: "POST",
-      body: JSON.stringify(values),
-    });
-    const data = await response.json();
 
-    toast({ title: data });
+    try {
+      const response = await createUser(values);
 
-    setTimeout(() => {
-      if (data) {
-        router.push(`/auth/complete-profile`);
+      toast({ title: "Registro feito com sucesso!" });
+
+      const logInResponse = await signInWithCreds({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (logInResponse) {
+        setTimeout(() => {
+          router.push(`/auth/complete-profile`);
+        }, 1000);
       }
-    }, 1000);
+    } catch (error: any) {
+      toast({
+        title: error.message || "Erro desconhecido ao fazer registro.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    setIsLoading(false);
+  const onClick = () => {
+    signInWithGoogle();
   };
 
   const onLoginSubmit = async (values: z.infer<typeof LoginFormValidation>) => {
     setIsLoading(true);
+    try {
+      const response = await signInWithCreds({
+        email: values.email,
+        password: values.password,
+      });
 
-    const response = await signInWithCreds({
-      email: values.email,
-      password: values.password,
-    });
+      toast({ title: "Login feito com sucesso!" });
 
-    if (!response) {
+      if (response) {
+        setTimeout(() => {
+          if (response) {
+            if (!response.isDone) return router.push(`/auth/complete-profile`);
+            else router.push(`/`);
+          }
+        }, 1000);
+      }
+    } catch (error: any) {
       toast({
-        title: "Error",
+        title: error.message || "Erro desconhecido ao fazer login.",
         variant: "destructive",
       });
-      return;
+    } finally {
+      setIsLoading(false);
     }
-
-    if (response) {
-      if (!response.isDone) {
-        router.push(`/auth/complete-profile`);
-      } else {
-        router.push(`/`);
-      }
-    }
-
-    toast({ title: "You are now signed in!" });
-    setIsLoading(false);
   };
 
   return (
-    <Tabs defaultValue="register" className="w-full max-w-md">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="register">Registrar</TabsTrigger>
-        <TabsTrigger value="login">Entrar</TabsTrigger>
+    <Tabs defaultValue="register" className="w-full max-w-md gap-4 flex flex-col">
+      <TabsList className="grid w-full grid-cols-2 ">
+        <TabsTrigger value="register" className="font-bold">
+          Registrar
+        </TabsTrigger>
+        <TabsTrigger value="login" className="font-bold">
+          Entrar
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="register">
         <Form {...registerForm}>
@@ -98,7 +120,7 @@ export const UserForm = () => {
             onSubmit={registerForm.handleSubmit(onRegisterSubmit)}
             className="flex-1 space-y-6"
           >
-            <section className="mb-12 space-y-4">
+            <section className="space-y-4">
               <h1 className="header">Olá 👋</h1>
               <p className="text-dark-700">Comece a agendar consultas.</p>
             </section>
@@ -159,13 +181,7 @@ export const UserForm = () => {
                 </div>
               </SelectItem>
             </CustomFormField>
-            <Button
-              onClick={(e) => {
-                e.preventDefault();
-                signInWithGoogle();
-              }}
-              className="text-sm"
-            >
+            <Button onClick={() => onClick()} className="text-sm">
               <FcGoogle size="lg" />
             </Button>
             <SubmitButton isLoading={isLoading}>Registrar</SubmitButton>
@@ -178,7 +194,7 @@ export const UserForm = () => {
             onSubmit={loginForm.handleSubmit(onLoginSubmit)}
             className="flex-1 space-y-6"
           >
-            <section className="mb-12 space-y-4">
+            <section className="space-y-4">
               <h1 className="header">Bem-vindo de volta 👋</h1>
               <p className="text-dark-700">Entre para agendar consultas.</p>
             </section>

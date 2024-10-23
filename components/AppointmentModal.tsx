@@ -15,16 +15,17 @@ import {
 import { AppointmentForm } from "./forms/Appointments/AppointmentForm";
 
 import "react-datepicker/dist/react-datepicker.css";
-import { Appointment } from "@prisma/client";
+import { Appointment, DoctorDetails } from "@prisma/client";
+import { ExtendUser } from "@/next-auth";
 
-export const AppointmentModal = ({
-  patientId,
-  userId,
+export const AppointmentModal = async ({
   appointment,
   type,
+  user,
+  doctors,
 }: {
-  patientId: string;
-  userId: string;
+  user: ExtendUser;
+  doctors: DoctorDetails[];
   appointment?: Appointment;
   type: "schedule" | "cancel";
   title: string;
@@ -50,7 +51,13 @@ export const AppointmentModal = ({
           </DialogDescription>
         </DialogHeader>
 
-        <AppointmentForm type={type} appointment={appointment} setOpen={setOpen} />
+        <AppointmentForm
+          user={user}
+          doctors={doctors}
+          type={type}
+          appointment={appointment}
+          setOpen={setOpen}
+        />
       </DialogContent>
     </Dialog>
   );

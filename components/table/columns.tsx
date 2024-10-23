@@ -7,9 +7,12 @@ import Image from "next/image";
 import { formatDateTime } from "@/lib/utils";
 import { AppointmentModal } from "../AppointmentModal";
 import { StatusBadge } from "../StatusBadge";
-import { CompleteAppointment, Doctor } from "@/types"; // Ensure Doctor type is defined
+import { CompleteAppointment } from "@/types";
 import { getAllDoctors } from "@/lib/actions/doctor.actions";
 import { DoctorDetails } from "@prisma/client";
+import { ExtendUser } from "@/next-auth";
+import { useSession } from "next-auth/react";
+import { auth } from "@/auth";
 
 export const columns: ColumnDef<CompleteAppointment>[] = [
   {
@@ -64,7 +67,7 @@ export const columns: ColumnDef<CompleteAppointment>[] = [
             const fetchedDoctors = await getAllDoctors();
             setDoctors(fetchedDoctors);
           } catch (error) {
-            console.error("Failed to fetch doctors:", error);
+            console.error("Falha ao buscar médicos:", error);
           } finally {
             setLoading(false);
           }
@@ -78,17 +81,25 @@ export const columns: ColumnDef<CompleteAppointment>[] = [
       return (
         <div className="flex items-center gap-3">
           {loading ? (
-            <p>Loading...</p>
+            <Image
+              src="/assets/icons/loader.svg"
+              alt="Carregando"
+              width={40}
+              height={40}
+              className="animate-spin"
+            />
           ) : (
             doctor && (
               <>
-                <Image
-                  src={doctor.imageProfile || "/placeholder.jpg"}
-                  alt="doctor"
-                  width={100}
-                  height={100}
-                  className="size-8"
-                />
+                {doctor.imageProfile && (
+                  <Image
+                    src={doctor.imageProfile}
+                    alt="Médico"
+                    width={100}
+                    height={100}
+                    className="size-8"
+                  />
+                )}
                 <p className="whitespace-nowrap">Dr. {doctor.name}</p>
               </>
             )
@@ -102,24 +113,51 @@ export const columns: ColumnDef<CompleteAppointment>[] = [
     header: () => <div className="pl-4">Ações</div>,
     cell: ({ row }) => {
       const appointment = row.original;
+      const [doctors, setDoctors] = useState<DoctorDetails[]>([]);
+      const { data: session, status } = useSession();
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        const fetchDoctors = async () => {
+          try {
+            const fetchedDoctors = await getAllDoctors();
+            setDoctors(fetchedDoctors);
+          } catch (error) {
+            console.error("Falha ao buscar médicos:", error);
+          } finally {
+            setLoading(false);
+          }
+        };
+        console.log(session?.user);
+
+        fetchDoctors();
+      }, []);
+      if (status === "loading" || loading) {
+        return <div>Carregando...</div>;
+      }
+
+      if (status === "unauthenticated") {
+        return <div>Acesso não autorizado</div>;
+      }
 
       return (
         <div className="flex gap-1">
           <AppointmentModal
-            patientId={appointment.patientId}
-            userId={appointment.patientId}
+            user={session?.user as ExtendUser}
+            doctors={doctors}
             appointment={appointment}
             type="schedule"
-            title="Schedule Appointment"
-            description="Please confirm the following details to schedule."
+            title="Agendar Consulta"
+            description="Por favor, confirme os detalhes a seguir para agendar."
           />
+
           <AppointmentModal
-            patientId={appointment.patientId}
-            userId={appointment.patientId}
+            user={session?.user as ExtendUser}
+            doctors={doctors}
             appointment={appointment}
             type="cancel"
-            title="Cancel Appointment"
-            description="Are you sure you want to cancel your appointment?"
+            title="Cancelar Consulta"
+            description="Tem certeza de que deseja cancelar sua consulta?"
           />
         </div>
       );

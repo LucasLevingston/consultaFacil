@@ -60,9 +60,11 @@ const config = {
         ],
       },
       backgroundImage: {
-        appointments: "url('/assets/images/appointments-bg.png')",
-        pending: "url('/assets/images/pending-bg.png')",
-        cancelled: "url('/assets/images/cancelled-bg.png')",
+        scheduled: "url('/assets/images/appointments-bg.png')",
+        pending: "url('/assets/images/appointments-bg.png')",
+        canceled: "url('/assets/images/appointments-bg.png')",
+        finalized: "url('/assets/images/appointments-bg.png')",
+        all: "url('/assets/images/appointments-bg.png')",
       },
       keyframes: {
         "accordion-down": {

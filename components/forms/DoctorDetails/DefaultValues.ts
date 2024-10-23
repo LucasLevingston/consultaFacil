@@ -1,4 +1,4 @@
-import { Doctor } from "@/types"; // Adjust the path as necessary
+import { Doctor } from "@/types";
 
 export const DoctorFormDefaultValues = {
   userId: "",

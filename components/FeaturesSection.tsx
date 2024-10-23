@@ -9,7 +9,7 @@ export function FeaturesSection() {
           Recursos do ConsultaFácil
         </h2>
         <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3">
-          <Card>
+          <Card className="dark:bg-dark-500">
             <CardHeader>
               <Calendar className="h-12 w-12 mb-4 text-primary" />
               <CardTitle>Agendamento Flexível</CardTitle>
@@ -20,7 +20,7 @@ export function FeaturesSection() {
               </p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="dark:bg-dark-500">
             <CardHeader>
               <User className="h-12 w-12 mb-4 text-primary" />
               <CardTitle>Perfil do Médico</CardTitle>
@@ -31,7 +31,7 @@ export function FeaturesSection() {
               </p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="dark:bg-dark-500">
             <CardHeader>
               <Phone className="h-12 w-12 mb-4 text-primary" />
               <CardTitle>Lembretes por SMS</CardTitle>

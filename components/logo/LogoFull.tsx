@@ -4,8 +4,8 @@ import Image from "next/image";
 
 export default function LogoFull() {
   return (
-    <Link className="flex items-center justify-center" href="/">
-      <Button variant="ghost" className="flex gap-2">
+    <Button variant="ghost" className="">
+      <Link className="flex items-center justify-center p-4 gap-3" href="/">
         <Image
           src="/assets/icons/logo-icon.svg"
           height={1000}
@@ -14,7 +14,7 @@ export default function LogoFull() {
           className="h-10 w-fit"
         />
         <span className="text-lg font-bold">ConsultaFácil</span>
-      </Button>
-    </Link>
+      </Link>
+    </Button>
   );
 }

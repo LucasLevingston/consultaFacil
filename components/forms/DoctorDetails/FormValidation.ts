@@ -8,7 +8,7 @@ export const DoctorFormValidation = z.object({
   specialty: z.string().min(1, "Especialidade é obrigatório."),
   licenseNumber: z.string().min(1, "Número de licença é obrigatório."),
   identificationType: z.string().min(1, "Tipo de identificação é obrigatório."),
-  cpf: z.string().min(1, "Número de identificação é obrigatório."),
+  cpf: z.string().min(1, "CPF é obrigatório."),
   identificationDocument: z.custom<File[]>().optional() || z.string().optional(),
   privacyConsent: z.boolean().refine((val) => val === true, {
     message: "Você deve consentir com a política de privacidade.",

@@ -1,16 +1,13 @@
+"use server";
+
 import { auth } from "@/auth";
 import Link from "next/link";
-import Image from "next/image";
 import {
-  Clock,
   LogOut,
-  Menu,
   Settings,
   CalendarCheck,
   CalendarCheck2,
   CircleUser,
-  Package2,
-  Search,
   User,
   Stethoscope,
 } from "lucide-react";
@@ -24,19 +21,17 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
 } from "./ui/dropdown-menu";
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
-import { SignOut } from "@/lib/actions/user.actions";
 import { Input } from "./ui/input";
 import LogoFull from "./logo/LogoFull";
+import LogOutButton from "./LogOutButton";
 
 export async function Header() {
   const session = await auth();
 
   return (
-    <header className="sticky top-0 flex h-16 items-center gap-4 border-b  px-4 md:px-6">
+    <header className=" top-0 flex h-16 items-center gap-4 border-b px-4 md:px-6 bg-white dark:bg-dark-200">
       <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-3 md:text-sm lg:gap-4">
         <LogoFull />
-
         <Link
           href="/"
           className="text-foreground transition-colors hover:text-foreground"
@@ -49,47 +44,43 @@ export async function Header() {
           href="/agendar-consulta"
           className="text-muted-foreground transition-colors hover:text-foreground"
         >
-          {" "}
           <Button variant="ghost" className="flex gap-2">
-            Agendar consulta{" "}
+            Agendar consulta
           </Button>
         </Link>
         <Link
           href="/consultas"
           className="text-muted-foreground transition-colors hover:text-foreground"
         >
-          {" "}
           <Button variant="ghost" className="flex gap-2">
-            Minhas consultas{" "}
+            Minhas consultas
           </Button>
         </Link>
         <Link
           href="/profissionais"
           className="text-muted-foreground transition-colors hover:text-foreground"
         >
-          {" "}
           <Button variant="ghost" className="flex gap-2">
-            Profissionais{" "}
+            Profissionais
           </Button>
         </Link>
         <Link
           href="/clinicas"
           className="text-muted-foreground transition-colors hover:text-foreground"
         >
-          {" "}
           <Button variant="ghost" className="flex gap-2">
-            Clinicas e organizações{" "}
+            Clinicas e organizações
           </Button>
         </Link>
       </nav>
       <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
         <form className="ml-auto flex-1 sm:flex-initial">
-          <div className=" flex items-centrer">
-            <Input
+          <div className="flex items-center">
+            {/* <Input
               type="search"
               placeholder="Search products..."
               className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-            />
+            /> */}
           </div>
         </form>
         <DropdownMenu>
@@ -102,7 +93,7 @@ export async function Header() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel className="flex items-center justify-between">
               Opções
-              <span>{session?.user.role === "doctor" ? <Stethoscope /> : <User />}</span>
+              <span>{session?.user?.role === "doctor" ? <Stethoscope /> : <User />}</span>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             {session?.user ? (
@@ -130,12 +121,7 @@ export async function Header() {
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
-                <DropdownMenuItem asChild onClick={SignOut} className="flex items-center">
-                  <span>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sair da conta</span>
-                  </span>
-                </DropdownMenuItem>
+                <LogOutButton />
               </>
             ) : (
               <DropdownMenuItem asChild>

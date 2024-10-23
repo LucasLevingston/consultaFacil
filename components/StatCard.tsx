@@ -1,21 +1,44 @@
+"use client";
+
+import { Status } from "@prisma/client";
 import clsx from "clsx";
 import Image from "next/image";
 
 type StatCardProps = {
-  type: "appointments" | "pending" | "cancelled";
+  type?: Status;
   count: number;
   label: string;
   icon: string;
+  onClick?: () => void;
+  onActive: boolean;
 };
 
-export const StatCard = ({ count = 0, label, icon, type }: StatCardProps) => {
+export const StatCard = ({
+  count = 0,
+  label,
+  icon,
+  type,
+  onClick,
+  onActive,
+}: StatCardProps) => {
   return (
     <div
       className={clsx("stat-card", {
-        "bg-appointments": type === "appointments",
+        "bg-scheduled": type === "scheduled",
         "bg-pending": type === "pending",
-        "bg-cancelled": type === "cancelled",
+        "bg-canceled": type === "canceled",
+        "bg-finalized": type === "finalized",
+        "bg-all": !type,
+        "opacity-50": onActive,
       })}
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyPress={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          onClick?.();
+        }
+      }}
     >
       <div className="flex items-center gap-4">
         <Image

@@ -5,7 +5,6 @@ import DoctorDashboard from "./_components/DoctorAppointments";
 import PatientDashboard from "./_components/PatientAppointments";
 import { ExtendUser } from "@/next-auth";
 import Loading from "@/components/loading";
-import Link from "next/link";
 import LogoFull from "@/components/logo/LogoFull";
 
 const AppointmentsDashboard = async () => {

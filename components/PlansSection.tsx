@@ -9,13 +9,13 @@ export function PlansSection() {
         <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8">
           Planos para Médicos
         </h2>
-        <p className="text-xl text-center text-gray-500 dark:text-gray-400 mb-8">
+        <p className="text-xl text-center text-gray-500 dark:text-gray-200 mb-8">
           Escolha o plano ideal para sua prática médica e comece a atender pacientes
           através do ConsultaFácil
         </p>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {/* Basic Plan */}
-          <Card>
+          <Card className="dark:bg-dark-600">
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-center">Básico</CardTitle>
               <p className="text-4xl font-bold text-center">
@@ -41,7 +41,7 @@ export function PlansSection() {
             </CardContent>
           </Card>
           {/* Professional Plan */}
-          <Card className="border-primary">
+          <Card className="border-primary dark:bg-dark-600">
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-center">
                 Profissional
@@ -73,7 +73,7 @@ export function PlansSection() {
             </CardContent>
           </Card>
           {/* Clinic Plan */}
-          <Card>
+          <Card className="dark:bg-dark-600">
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-center">Clínica</CardTitle>
               <p className="text-4xl font-bold text-center">

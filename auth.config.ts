@@ -9,10 +9,14 @@ import { getUser } from "./lib/actions/user.actions";
 export default {
   providers: [
     GitHub,
-    Google,
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+    }),
     Credentials({
       async authorize(credentials) {
         const validatedFields = LoginFormValidation.safeParse(credentials);
+        console.log(validatedFields);
         if (validatedFields.success) {
           const { email } = validatedFields.data;
 
