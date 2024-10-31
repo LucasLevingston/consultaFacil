@@ -1,6 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import bcrypt from "bcryptjs";
 import { CompleteAppointment } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
@@ -72,19 +71,16 @@ export const formatDateTime = (
   };
 };
 
-export function encryptKey(passkey: string) {
-  return btoa(passkey);
-}
-
-export function decryptKey(passkey: string) {
-  return atob(passkey);
-}
 export async function hashPassword(password: string) {
+  const bcrypt = require("bcryptjs");
+
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
   return hash;
 }
 export async function comparePassword(password: string, userPassword: string) {
+  const bcrypt = require("bcryptjs");
+
   return await bcrypt.compare(password, userPassword);
 }
 

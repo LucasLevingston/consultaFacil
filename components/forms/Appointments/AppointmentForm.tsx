@@ -189,10 +189,10 @@ export const AppointmentForm = ({
                       <span> {doctor.licenseNumber}</span>
                     </div>
                   )}
-                  {doctor.adress && (
+                  {doctor.address && (
                     <div className="flex items-center gap-2">
                       <LocateIcon className="h-4 w-4 text-muted-foreground" />
-                      <span>Endereço: {doctor.adress}</span>
+                      <span>Endereço: {doctor.address}</span>
                     </div>
                   )}
                 </CardContent>

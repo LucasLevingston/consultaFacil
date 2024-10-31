@@ -1,77 +1,46 @@
-"use server";
-
 import Image from "next/image";
-import Link from "next/link";
 
-import { StatCard } from "@/components/StatCard";
-import { columns } from "@/components/table/columns";
-import { DataTable } from "@/components/table/DataTable";
 import { auth } from "@/auth";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { getUserByEmail } from "@/lib/actions/user.actions";
-import { getAppointments } from "@/lib/actions/appointment.actions";
+import { ExtendUser } from "@/next-auth";
+import Loading from "@/components/loading";
+import LogoFull from "@/components/logo/LogoFull";
+import AppointmentsDashboard from "@/components/AppointmentDashboard";
 
-const AdminPage = async () => {
-  const appointments = await getAppointments();
-
-  if (!appointments) {
-    return <p>Failed to load appointments. Please try again later.</p>;
-  }
+const AppointmentsPage = async () => {
+  const session = await auth();
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col space-y-14">
-      <header className="admin-header">
-        <Link href="/" className="cursor-pointer">
-          <Image
-            src="/assets/icons/logo-full.svg"
-            height={32}
-            width={162}
-            alt="logo"
-            className="h-8 w-fit"
-          />
-        </Link>
+    <div className="flex h-screen max-h-screen">
+      <section className="remove-scrollbar container">
+        <header className="admin-header">
+          <LogoFull />
+          <p className="text-16-semibold flex gap-2 items-center">
+            <span className="bg-red-700 rounded-full p-2 text-white">Admin</span>
+            <span>Dashboard</span>
+          </p>
+        </header>
+        <div className="sub-container max-w-[860px] flex-1 flex-col py-10">
+          <section className="w-full space-y-4">
+            <h1 className="header">Olá, {session?.user.name} 👋</h1>
+            <p className="">Aqui estão todas as consultas agendadas.</p>
+          </section>
+          {session?.user ? (
+            <AppointmentsDashboard user={session?.user as ExtendUser} role="admin" />
+          ) : (
+            <Loading />
+          )}
+        </div>
+      </section>
 
-        <p className="text-16-semibold">Admin Dashboard</p>
-      </header>
-
-      <main className="admin-main">
-        <section className="w-full space-y-4">
-          <h1 className="header">Welcome 👋</h1>
-          <p className="text-dark-700">Start the day with managing new appointments</p>
-        </section>
-
-        <section className="admin-stat">
-          <StatCard
-            type="scheduled"
-            count={appointments.scheduledCount}
-            label="Scheduled appointments"
-            icon={"/assets/icons/appointments.svg"}
-          />
-          <StatCard
-            type="pending"
-            count={appointments.pendingCount}
-            label="Pending appointments"
-            icon={"/assets/icons/pending.svg"}
-          />
-          <StatCard
-            type="canceled"
-            count={appointments.cancelledCount}
-            label="Cancelled appointments"
-            icon={"/assets/icons/cancelled.svg"}
-          />
-          <StatCard
-            type="finalized"
-            count={appointments.cancelledCount}
-            label="Cancelled appointments"
-            icon={"/assets/icons/finalized.svg"}
-          />
-        </section>
-
-        <DataTable columns={columns} data={appointments.documents} />
-      </main>
+      <Image
+        src="/assets/images/register-img.png"
+        height={1000}
+        width={1000}
+        alt="paciente"
+        className="side-img max-w-[390px]"
+      />
     </div>
   );
 };
 
-export default AdminPage;
+export default AppointmentsPage;

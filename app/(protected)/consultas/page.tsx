@@ -1,13 +1,12 @@
 import Image from "next/image";
 
 import { auth } from "@/auth";
-import DoctorDashboard from "./_components/DoctorAppointments";
-import PatientDashboard from "./_components/PatientAppointments";
 import { ExtendUser } from "@/next-auth";
 import Loading from "@/components/loading";
 import LogoFull from "@/components/logo/LogoFull";
+import AppointmentsDashboard from "@/components/AppointmentDashboard";
 
-const AppointmentsDashboard = async () => {
+const AppointmentsPage = async () => {
   const session = await auth();
 
   return (
@@ -22,14 +21,13 @@ const AppointmentsDashboard = async () => {
         <div className="sub-container max-w-[860px] flex-1 flex-col py-10">
           <section className="w-full space-y-4">
             <h1 className="header">Olá, {session?.user.name} 👋</h1>
-            <p className="text-dark-700">Aqui estão suas consultas agendadas.</p>
+            <p>Aqui estão suas consultas agendadas.</p>
           </section>
           {session?.user ? (
-            session.user.role === "doctor" ? (
-              <DoctorDashboard user={session.user as ExtendUser} />
-            ) : (
-              <PatientDashboard user={session.user as ExtendUser} />
-            )
+            <AppointmentsDashboard
+              user={session?.user as ExtendUser}
+              role={session.user.role}
+            />
           ) : (
             <Loading />
           )}
@@ -47,4 +45,4 @@ const AppointmentsDashboard = async () => {
   );
 };
 
-export default AppointmentsDashboard;
+export default AppointmentsPage;

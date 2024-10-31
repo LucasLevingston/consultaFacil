@@ -23,7 +23,7 @@ interface DoctorCardProps {
 export default function DoctorCard({ doctor }: DoctorCardProps) {
   const route = useRouter();
   const handleRedirect = () => {
-    route.push(`/agendar-consulta?doctorid=${doctor.id}`);
+    route.push(`/agendar-consulta?doctorid=${doctor.userId}`);
   };
   return (
     <Card className="w-full max-w-sm">
@@ -40,12 +40,17 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
                   .split(" ")
                   .map((n) => n[0])
                   .join("")
-              : "DR"}
+              : doctor.gender === "male"
+                ? "Dr."
+                : "Dra."}
           </AvatarFallback>
         </Avatar>
         <div>
           <Link href={`/profissionais/${doctor.userId}`}>
-            <CardTitle>{doctor.name || "Nome não informado"}</CardTitle>
+            <CardTitle>
+              {doctor.gender === "female" ? "Dra. " : "Dr. "}
+              {doctor.name || "Nome não informado"}
+            </CardTitle>
           </Link>
           <Badge variant="secondary" className="mt-1">
             {doctor.specialty || "Especialidade não informada"}

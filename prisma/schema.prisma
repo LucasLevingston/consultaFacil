@@ -51,6 +51,7 @@ model User {
   phone String?
   password String?
   image         String?
+  imageId         String?
   isDone Boolean @default(false)
   role Role
 
@@ -86,7 +87,8 @@ model DoctorDetails {
   email                     String?
   licenseNumber             String?
   privacyConsent            Boolean?
-  imageProfile String?
+  imageProfileUrl String?
+  imageProfileId String?
   cpf String?
   identificationDocumentId String?
   identificationDocumentType  String?
@@ -121,8 +123,9 @@ model PatientDetails {
   treatmentConsent Boolean?
   disclosureConsent Boolean?
   cpf String?
-  imageProfile String?
-  identificationDocumentId String?
+ imageProfileUrl String?
+  imageProfileId String?
+    identificationDocumentId String?
   identificationDocumentType  String?
   identificationDocumentUrl String?
 

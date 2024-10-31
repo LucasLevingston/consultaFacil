@@ -4,17 +4,21 @@ import { useEffect, useState } from "react";
 import { StatCard } from "@/components/StatCard";
 import { columns } from "@/components/table/columns";
 import { DataTable } from "@/components/table/DataTable";
-import { getAppointmentsByPatientId } from "@/lib/actions/appointment.actions";
+import {
+  getAppointments,
+  getAppointmentsByDoctorId,
+  getAppointmentsByPatientId,
+} from "@/lib/actions/appointment.actions";
 import { ExtendUser } from "@/next-auth";
-import { Appointment } from "@prisma/client"; // Verifique se você precisa dessa importação
-import { AppointmentCount, CompleteAppointment } from "@/types"; // Certifique-se de que esta interface está correta
+import { AppointmentCount, CompleteAppointment } from "@/types";
 import Loading from "@/components/loading";
 
-interface PatientAppointmentsProps {
+interface AppointmentsDashboardProps {
   user: ExtendUser;
+  role: "patient" | "doctor" | "admin";
 }
 
-const PatientAppointments: React.FC<PatientAppointmentsProps> = ({ user }) => {
+const AppointmentsDashboard: React.FC<AppointmentsDashboardProps> = ({ user, role }) => {
   const [appointments, setAppointments] = useState<AppointmentCount | null>(null);
   const [filteredAppointments, setFilteredAppointments] = useState<CompleteAppointment[]>(
     []
@@ -22,10 +26,16 @@ const PatientAppointments: React.FC<PatientAppointmentsProps> = ({ user }) => {
   const [activeType, setActiveType] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  let data: AppointmentCount;
   useEffect(() => {
     const fetchAppointments = async () => {
       setIsLoading(true);
-      const data = await getAppointmentsByPatientId(user.id);
+      if (role === "patient") data = await getAppointmentsByPatientId(user.id);
+
+      if (role === "doctor") data = await getAppointmentsByDoctorId(user.id);
+
+      if (role === "admin") data = await getAppointments();
+
       if (data) {
         setAppointments(data);
         setFilteredAppointments(data.documents);
@@ -105,4 +115,4 @@ const PatientAppointments: React.FC<PatientAppointmentsProps> = ({ user }) => {
   );
 };
 
-export default PatientAppointments;
+export default AppointmentsDashboard;

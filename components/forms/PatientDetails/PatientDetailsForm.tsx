@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -19,13 +18,10 @@ import "react-phone-number-input/style.css";
 import CustomFormField, { FormFieldType } from "../../CustomFormField";
 import { FileUploader } from "../../FileUploader";
 import SubmitButton from "../../SubmitButton";
-import { Patient, RegisterPatientParams } from "@/types";
-import { getDefaultValues, PatientFormDefaultValues } from "./DefaultValues";
+import { Patient } from "@/types";
+import { getDefaultValues } from "./DefaultValues";
 import { PatientFormValidation } from "./FormValidation";
 import { toast } from "@/hooks/use-toast";
-import { updateUser } from "@/lib/actions/user.actions";
-import { PatientDetails } from "@prisma/client";
-import image from "next/image";
 
 interface PatientDetailsProps {
   user: Patient;
@@ -89,7 +85,8 @@ const PatientDetailsForm = ({ user, type }: PatientDetailsProps) => {
           identificationDocumentId: user.patientDetails?.identificationDocumentId || null,
           identificationDocumentUrl:
             user.patientDetails?.identificationDocumentUrl || null,
-          imageProfile: "",
+          imageProfileId: user.patientDetails?.imageProfileId || null,
+          imageProfileUrl: user.patientDetails?.imageProfileUrl || null,
         },
       };
       const newPatient = await registerPatient({

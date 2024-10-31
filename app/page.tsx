@@ -6,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { ContactSection } from "@/components/ContactSection";
-import { PlansSection } from "@/components/PlansSection";
 import { FeaturesSection } from "@/components/FeaturesSection";
+import { PlansSection } from "@/components/plans/PlansSection";
 
 export default function Home() {
   const router = useRouter();

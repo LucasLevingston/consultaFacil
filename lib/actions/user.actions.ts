@@ -7,7 +7,6 @@ import { PatientDetails, DoctorDetails, User } from "@prisma/client";
 import { SignInResponse } from "next-auth/react";
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
-import bcrypt from "bcryptjs";
 import { ExtendUser } from "@/next-auth";
 
 export const getUserByEmail = async (email: string) => {
@@ -64,7 +63,7 @@ export const signInWithCreds = async (data: { email: string; password: string })
     }
     if (!existingUser.password) throw new Error("Password not defined!");
 
-    const passwordMatch = await bcrypt.compare(data.password, existingUser.password);
+    const passwordMatch = await comparePassword(data.password, existingUser.password);
 
     if (!passwordMatch) throw new Error("Invalid credentials!");
 

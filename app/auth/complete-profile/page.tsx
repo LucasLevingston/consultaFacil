@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import DoctorDetailsForm from "@/components/forms/DoctorDetails/DoctorDetailsForm";
 import Loading from "@/components/loading";
 import { ExtendUser } from "@/next-auth";
+import LogoFull from "@/components/logo/LogoFull";
 
 const Register = async () => {
   const session = await auth();
@@ -12,13 +13,7 @@ const Register = async () => {
     <div className="flex h-screen max-h-screen">
       <section className="remove-scrollbar container">
         <div className="sub-container max-w-[860px] flex-1 flex-col py-10">
-          <Image
-            src="/assets/icons/logo-full.svg"
-            height={1000}
-            width={1000}
-            alt="patient"
-            className="mb-12 h-10 w-fit"
-          />
+          <LogoFull />
           <section className="space-y-4">
             <h1 className="header">Bem-vindo 👋</h1>
             <p className="text-dark-700">Conte-nos mais sobre você.</p>

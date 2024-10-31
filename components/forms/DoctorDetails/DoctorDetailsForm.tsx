@@ -45,15 +45,25 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
   const onSubmit = async (values: z.infer<typeof DoctorFormValidation>) => {
     setIsLoading(true);
 
-    let formData;
+    let documentFormData;
     if (values.identificationDocument && values.identificationDocument.length > 0) {
       const blobFile = new Blob([values.identificationDocument[0]], {
         type: values.identificationDocument[0].type,
       });
 
-      formData = new FormData();
-      formData.append("blobFile", blobFile);
-      formData.append("fileName", values.identificationDocument[0].name);
+      documentFormData = new FormData();
+      documentFormData.append("blobFile", blobFile);
+      documentFormData.append("fileName", values.identificationDocument[0].name);
+    }
+    let imageFormData;
+    if (values.imageProfile && values.imageProfile.length > 0) {
+      const blobFile = new Blob([values.imageProfile[0]], {
+        type: values.imageProfile[0].type,
+      });
+
+      imageFormData = new FormData();
+      imageFormData.append("blobFile", blobFile);
+      imageFormData.append("fileName", values.imageProfile[0].name);
     }
 
     try {
@@ -62,7 +72,7 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
         emailVerified: user.emailVerified,
         isDone: user.isDone,
         role: user.role,
-        image: user.image,
+        image: user.image || null,
         password: user.password,
         doctorDetails: {
           userId: user.id,
@@ -73,20 +83,24 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
           specialty: values.specialty,
           licenseNumber: values.licenseNumber,
           identificationDocumentType: values.identificationDocumentType,
-          identificationDocumentId: user.patientDetails?.identificationDocumentId || null,
+          identificationDocumentId: user.doctorDetails?.identificationDocumentId || null,
           identificationDocumentUrl:
-            user.patientDetails?.identificationDocumentUrl || null,
+            user.doctorDetails?.identificationDocumentUrl || null,
           cpf: values.cpf,
           privacyConsent: values.privacyConsent,
           address: values.address,
-          imageProfile: "",
           gender: values.gender,
+          imageProfileId: user.doctorDetails?.imageProfileId || null,
+          imageProfileUrl: user.doctorDetails?.imageProfileUrl || null,
         },
       };
 
       const newDoctor = await registerDoctor({
         ...doctor,
-        identificationDocument: values.identificationDocument ? formData : undefined,
+        identificationDocument: values.identificationDocument
+          ? documentFormData
+          : undefined,
+        imageFile: values.imageProfile ? imageFormData : undefined,
       });
       if (newDoctor) {
         toast({ title: "Dados salvos com sucesso!" });
@@ -110,36 +124,75 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
           <div className="mb-9 space-y-1">
             <h2 className="sub-header">Informações Pessoais</h2>
           </div>
-
-          {/* NOME */}
-          <CustomFormField
-            fieldType={FormFieldType.INPUT}
-            control={form.control}
-            name="name"
-            placeholder="João da Silva"
-            iconSrc="/assets/icons/user.svg"
-            iconAlt="usuário"
-          />
-
-          {/* EMAIL & TELEFONE */}
-          <div className="flex flex-col gap-6 xl:flex-row">
-            <CustomFormField
-              fieldType={FormFieldType.INPUT}
-              control={form.control}
-              name="email"
-              label="Endereço de E-mail"
-              placeholder="joaodasilva@gmail.com"
-              iconSrc="/assets/icons/email.svg"
-              iconAlt="email"
-            />
-
-            <CustomFormField
-              fieldType={FormFieldType.PHONE_INPUT}
-              control={form.control}
-              name="phone"
-              label="Número de Telefone"
-              placeholder="(555) 123-4567"
-            />
+          <div className="flex items-center gap-6 w-full">
+            <div className="flex flex-row gap-6 xl:flex-col min-w-[50%]">
+              <CustomFormField
+                fieldType={FormFieldType.INPUT}
+                control={form.control}
+                name="name"
+                label="Nome completo"
+                placeholder="João da Silva"
+                iconSrc="/assets/icons/user.svg"
+                iconAlt="usuário"
+              />{" "}
+              <CustomFormField
+                fieldType={FormFieldType.INPUT}
+                control={form.control}
+                name="email"
+                label="Endereço de E-mail"
+                placeholder="joaodasilva@gmail.com"
+                iconSrc="/assets/icons/email.svg"
+                iconAlt="email"
+              />{" "}
+              <CustomFormField
+                fieldType={FormFieldType.PHONE_INPUT}
+                control={form.control}
+                name="phone"
+                label="Número de Telefone"
+                placeholder="(555) 123-4567"
+              />
+            </div>
+            <div className="flex flex-row gap-6 xl:flex-col min-w-[50%]">
+              <CustomFormField
+                fieldType={FormFieldType.SKELETON}
+                control={form.control}
+                name="imageProfile"
+                label="Foto de perfil"
+                renderSkeleton={(field) => (
+                  <FormControl>
+                    <FileUploader
+                      files={field.value}
+                      onChange={field.onChange}
+                      imageProfile
+                    />
+                  </FormControl>
+                )}
+              />{" "}
+              <CustomFormField
+                fieldType={FormFieldType.SKELETON}
+                control={form.control}
+                name="gender"
+                label="Gênero"
+                renderSkeleton={(field) => (
+                  <FormControl>
+                    <RadioGroup
+                      className="flex h-11 gap-6 xl:justify-between"
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      {GenderOptions.map((option, i) => (
+                        <div key={option.value + i} className="radio-group">
+                          <RadioGroupItem value={option.value} id={option.value} />
+                          <Label htmlFor={option.value} className="cursor-pointer">
+                            {option.label}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                )}
+              />
+            </div>
           </div>
           <div className="flex flex-col gap-6 xl:flex-row">
             <CustomFormField
@@ -148,39 +201,14 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
               name="birthDate"
               label="Data de Nascimento"
             />
-
             <CustomFormField
-              fieldType={FormFieldType.SKELETON}
+              fieldType={FormFieldType.INPUT}
               control={form.control}
-              name="gender"
-              label="Gênero"
-              renderSkeleton={(field) => (
-                <FormControl>
-                  <RadioGroup
-                    className="flex h-11 gap-6 xl:justify-between"
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    {GenderOptions.map((option, i) => (
-                      <div key={option.value + i} className="radio-group">
-                        <RadioGroupItem value={option.value} id={option.value} />
-                        <Label htmlFor={option.value} className="cursor-pointer">
-                          {option.label}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </FormControl>
-              )}
+              name="cpf"
+              label="CPF"
+              placeholder="123456789"
             />
           </div>
-          <CustomFormField
-            fieldType={FormFieldType.INPUT}
-            control={form.control}
-            name="cpf"
-            label="CPF"
-            placeholder="123456789"
-          />
           <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
@@ -188,7 +216,7 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
             label="Endereço"
             placeholder="Rua visconde neto 35 - Patos, PB"
           />
-          {/* ESPECIALIDADE & NÚMERO DA LICENÇA */}
+          <h2 className="sub-header">Informações pessoais</h2>
           <div className="flex flex-col gap-6 xl:flex-row">
             <CustomFormField
               fieldType={FormFieldType.INPUT}

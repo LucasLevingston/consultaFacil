@@ -39,6 +39,7 @@ declare type UpdateAppointmentParams = {
 
 export interface RegisterDoctorParams extends Doctor {
   identificationDocument?: FormData;
+  imageFile?: FormData;
 }
 
 export interface User {
