@@ -2,25 +2,26 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { FcGoogle } from "react-icons/fc";
 import { z } from "zod";
 
 import { Form } from "@/components/ui/form";
-import { UserFormValidation, LoginFormValidation } from "@/lib/validation";
-
-import "react-phone-number-input/style.css";
-import CustomFormField, { FormFieldType } from "../CustomFormField";
-import SubmitButton from "../SubmitButton";
-import { SelectItem } from "../ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "@/hooks/use-toast";
 import {
   createUser,
   signInWithCreds,
   signInWithGoogle,
 } from "@/lib/actions/user.actions";
-import { toast } from "@/hooks/use-toast";
+import { UserFormValidation, LoginFormValidation } from "@/lib/validation";
+
+import "react-phone-number-input/style.css";
+import CustomFormField, { FormFieldType } from "../CustomFormField";
+import SubmitButton from "../SubmitButton";
 import { Button } from "../ui/button";
-import { FcGoogle } from "react-icons/fc";
-import router from "next/router";
+import { SelectItem } from "../ui/select";
+
+
 export const UserForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +49,7 @@ export const UserForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await createUser(values);
+      await createUser(values);
 
       toast({ title: "Registro feito com sucesso!" });
 
@@ -59,7 +60,7 @@ export const UserForm = () => {
 
       if (logInResponse) {
         setTimeout(() => {
-          router.push(`/auth/complete-profile`);
+          router.push(`/auth/completar-cadastro`);
         }, 1000);
       }
     } catch (error: any) {
@@ -72,9 +73,9 @@ export const UserForm = () => {
     }
   };
 
-  const onClick = () => {
-    signInWithGoogle();
-  };
+  // const onClick = () => {
+  //   signInWithGoogle();
+  // };
 
   const onLoginSubmit = async (values: z.infer<typeof LoginFormValidation>) => {
     setIsLoading(true);
@@ -88,7 +89,7 @@ export const UserForm = () => {
       if (response) {
         setTimeout(() => {
           if (response) {
-            if (!response.isDone) return router.push(`/auth/complete-profile`);
+            if (!response.isDone) return router.push(`/auth/completar-cadastro`);
             else router.push(`/`);
           }
         }, 1000);
@@ -104,7 +105,7 @@ export const UserForm = () => {
   };
 
   return (
-    <Tabs defaultValue="register" className="w-full max-w-md gap-4 flex flex-col">
+    <Tabs defaultValue="register" className="flex w-full max-w-md flex-col gap-4">
       <TabsList className="grid w-full grid-cols-2 ">
         <TabsTrigger value="register" className="font-bold">
           Registrar
@@ -180,9 +181,9 @@ export const UserForm = () => {
                 </div>
               </SelectItem>
             </CustomFormField>
-            <Button onClick={() => onClick()} className="text-sm">
+            {/* <Button onClick={() => onClick()} className="text-sm">
               <FcGoogle size="lg" />
-            </Button>
+            </Button> */}
             <SubmitButton isLoading={isLoading}>Registrar</SubmitButton>
           </form>
         </Form>

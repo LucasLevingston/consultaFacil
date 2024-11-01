@@ -1,7 +1,8 @@
-import { Patient } from "@/types";
 import { Gender } from "@prisma/client";
 
-export const PatientFormDefaultValues = {
+import { Patient } from "@/types";
+
+export const PatientDefaultValues = {
   name: "",
   email: "",
   phone: "",
@@ -26,37 +27,26 @@ export const PatientFormDefaultValues = {
 export const getDefaultValues = (user: Patient) => {
   const patientDetails = user.patientDetails || {};
   return {
-    name: user.name || PatientFormDefaultValues.name,
-    email: user.email || PatientFormDefaultValues.email,
-    phone: user.phone || PatientFormDefaultValues.phone,
-    birthDate: patientDetails.birthDate || PatientFormDefaultValues.birthDate,
-    gender: patientDetails.gender || PatientFormDefaultValues.gender,
-    address: patientDetails.address || PatientFormDefaultValues.address,
-    occupation: patientDetails.occupation || PatientFormDefaultValues.occupation,
-    emergencyContactName:
-      patientDetails.emergencyContactName ||
-      PatientFormDefaultValues.emergencyContactName,
-    emergencyContactNumber:
-      patientDetails.emergencyContactNumber ||
-      PatientFormDefaultValues.emergencyContactNumber,
-    allergies: patientDetails.allergies || PatientFormDefaultValues.allergies,
-    currentMedication:
-      patientDetails.currentMedication || PatientFormDefaultValues.currentMedication,
-    familyMedicalHistory:
-      patientDetails.familyMedicalHistory ||
-      PatientFormDefaultValues.familyMedicalHistory,
-    pastMedicalHistory:
-      patientDetails.pastMedicalHistory || PatientFormDefaultValues.pastMedicalHistory,
+    name: user.name || "",
+    email: user.email || "",
+    phone: user.phone || "",
+    birthDate: patientDetails.birthDate || new Date(Date.now()),
+    gender: patientDetails.gender || "male",
+    address: patientDetails.address || "",
+    occupation: patientDetails.occupation || "",
+    emergencyContactName: patientDetails.emergencyContactName || "",
+    emergencyContactNumber: patientDetails.emergencyContactNumber || "",
+    allergies: patientDetails.allergies || "",
+    currentMedication: patientDetails.currentMedication || "",
+    familyMedicalHistory: patientDetails.familyMedicalHistory || "",
+    pastMedicalHistory: patientDetails.pastMedicalHistory || "",
     identificationDocumentType:
-      patientDetails.identificationDocumentType ||
-      PatientFormDefaultValues.identificationDocumentType,
-    cpf: patientDetails.cpf || PatientFormDefaultValues.cpf,
+      patientDetails.identificationDocumentType || "Birth Certificate",
+    cpf: patientDetails.cpf || "",
     identificationDocument: undefined,
-    treatmentConsent:
-      patientDetails.treatmentConsent || PatientFormDefaultValues.treatmentConsent,
-    disclosureConsent:
-      patientDetails.disclosureConsent || PatientFormDefaultValues.disclosureConsent,
-    privacyConsent:
-      patientDetails.privacyConsent || PatientFormDefaultValues.privacyConsent,
+    imageProfile: undefined,
+    treatmentConsent: patientDetails.treatmentConsent || false,
+    disclosureConsent: patientDetails.disclosureConsent || false,
+    privacyConsent: patientDetails.privacyConsent || false,
   };
 };

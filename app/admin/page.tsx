@@ -1,10 +1,10 @@
 import Image from "next/image";
 
 import { auth } from "@/auth";
-import { ExtendUser } from "@/next-auth";
-import Loading from "@/components/loading";
-import LogoFull from "@/components/logo/LogoFull";
 import AppointmentsDashboard from "@/components/AppointmentDashboard";
+import HeaderSection from "@/components/HeaderSection";
+import Loading from "@/components/loading";
+import { ExtendUser } from "@/next-auth";
 
 const AppointmentsPage = async () => {
   const session = await auth();
@@ -12,13 +12,14 @@ const AppointmentsPage = async () => {
   return (
     <div className="flex h-screen max-h-screen">
       <section className="remove-scrollbar container">
-        <header className="admin-header">
-          <LogoFull />
-          <p className="text-16-semibold flex gap-2 items-center">
-            <span className="bg-red-700 rounded-full p-2 text-white">Admin</span>
-            <span>Dashboard</span>
-          </p>
-        </header>
+        <HeaderSection
+          label={
+            <>
+              <span className="rounded-full bg-red-700 p-2 text-white">Admin</span>{" "}
+              <span>Consultas</span>
+            </>
+          }
+        />
         <div className="sub-container max-w-[860px] flex-1 flex-col py-10">
           <section className="w-full space-y-4">
             <h1 className="header">Olá, {session?.user.name} 👋</h1>

@@ -1,11 +1,11 @@
-import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import NextAuth from "next-auth";
 
 import { prisma } from "@/lib/prisma";
+
 import authConfig from "./auth.config";
-import { getUser, getUserByEmail } from "./lib/actions/user.actions";
-import { publicRoutes, authRoutes } from "./routes";
-import { Doctor, Patient } from "./types";
+import { getUserByEmail } from "./lib/actions/user.actions";
+import { ExtendUser } from "./next-auth";
 
 export const {
   handlers: { GET, POST },
@@ -19,7 +19,7 @@ export const {
         session.user.id = token.sub;
       }
       if (token.user && session.user) {
-        session.user = token.user as Patient | Doctor;
+        session.user = token.user as ExtendUser;
       }
 
       return session;
@@ -37,30 +37,6 @@ export const {
 
       return token;
     },
-    // authorized({ request: { nextUrl }, auth }) {
-    //   const isLoggedIn = !!auth?.user;
-    //   const { pathname } = nextUrl;
-
-    //   if (publicRoutes.includes(pathname)) {
-    //     return true;
-    //   }
-    //   if (authRoutes.includes(pathname)) {
-    //     if (isLoggedIn) {
-    //       return Response.redirect(new URL("/", nextUrl));
-    //     }
-    //     return true;
-    //   }
-    //   console.log(isLoggedIn);
-
-    //   return isLoggedIn;
-    // },  // async signIn({ user }) {
-    //   if (!user.id || !user) return false;
-
-    //   const existingUser = await getUser(user.id);
-    //   console.log(existingUser);
-    //   if (!existingUser) return false;
-    //   return true;
-    // },
   },
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },

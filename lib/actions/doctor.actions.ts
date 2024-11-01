@@ -1,6 +1,10 @@
 "use server";
 
 import { ID, InputFile } from "node-appwrite";
+
+import { prisma } from "@/lib/prisma";
+import { RegisterDoctorParams } from "@/types";
+
 import {
   BUCKET_ID_DOCUMENT,
   BUCKET_ID_IMAGE,
@@ -8,10 +12,10 @@ import {
   PROJECT_ID,
   storage,
 } from "../appwrite.config";
-import { prisma } from "@/lib/prisma";
+
+import { createDocument } from "./bucket-actions/createDocument";
+import { createImageProfile } from "./bucket-actions/createImageProfile";
 import { getUser } from "./user.actions";
-import { RegisterDoctorParams } from "@/types";
-import image from "next/image";
 
 export const registerDoctor = async ({
   identificationDocument,
@@ -25,46 +29,16 @@ export const registerDoctor = async ({
     const existingDoctorDetails = await prisma.doctorDetails.findUnique({
       where: { userId: doctor.id },
     });
-    if (existingDoctorDetails) {
-      if (identificationDocument) {
-        const inputFile = InputFile.fromBlob(
-          identificationDocument.get("blobFile") as Blob,
-          identificationDocument.get("fileName") as string
-        );
 
-        uploadDocumentFile = await storage.createFile(
-          BUCKET_ID_DOCUMENT!,
-          ID.unique(),
-          inputFile
-        );
-      }
-
-      if (!uploadDocumentFile) {
-        throw new Error("Error upload document.");
-      }
+    if (identificationDocument) {
+      uploadDocumentFile = await createDocument(identificationDocument);
     }
     if (imageFile) {
-      if (identificationDocument) {
-        const inputFile = InputFile.fromBlob(
-          identificationDocument.get("blobFile") as Blob,
-          identificationDocument.get("fileName") as string
-        );
-
-        uploadImageFile = await storage.createFile(
-          BUCKET_ID_IMAGE!,
-          ID.unique(),
-          inputFile
-        );
-      }
-
-      if (!uploadImageFile) {
-        throw new Error("Error upload image.");
-      }
+      uploadImageFile = await createImageProfile(imageFile);
     }
 
     const user = await getUser(doctor.id);
     if (!user) {
-      console.log(doctor);
       throw new Error("User not found.");
     }
 
@@ -78,10 +52,10 @@ export const registerDoctor = async ({
         password: user.password,
         isDone: true,
         role: "doctor",
-        image: uploadImageFile?.$id
-          ? `${ENDPOINT}/storage/buckets/${BUCKET_ID_DOCUMENT}/files/${uploadImageFile.$id}/view?project=${PROJECT_ID}`
-          : null,
         imageId: uploadImageFile?.$id || null,
+        image: uploadImageFile?.$id
+          ? `${ENDPOINT}/storage/buckets/${BUCKET_ID_IMAGE}/files/${uploadImageFile.$id}/view?project=${PROJECT_ID}`
+          : null,
         doctorDetails: existingDoctorDetails
           ? {
               update: {
@@ -95,22 +69,14 @@ export const registerDoctor = async ({
                 email: doctor.doctorDetails.email,
                 phone: doctor.doctorDetails.phone,
                 name: doctor.doctorDetails.name,
-                imageProfileId: uploadImageFile?.$id
-                  ? `${ENDPOINT}/storage/buckets/${BUCKET_ID_DOCUMENT}/files/${uploadImageFile.$id}/view?project=${PROJECT_ID}`
-                  : null,
+                imageProfileId: uploadImageFile?.$id || null,
                 imageProfileUrl: uploadImageFile?.$id
-                  ? `${ENDPOINT}/storage/buckets/${BUCKET_ID_DOCUMENT}/files/${uploadImageFile.$id}/view?project=${PROJECT_ID}`
+                  ? `${ENDPOINT}/storage/buckets/${BUCKET_ID_IMAGE}/files/${uploadImageFile.$id}/view?project=${PROJECT_ID}`
                   : null,
               },
             }
           : {
               create: {
-                imageProfileId: uploadImageFile?.$id
-                  ? `${ENDPOINT}/storage/buckets/${BUCKET_ID_DOCUMENT}/files/${uploadImageFile.$id}/view?project=${PROJECT_ID}`
-                  : null,
-                imageProfileUrl: uploadImageFile?.$id
-                  ? `${ENDPOINT}/storage/buckets/${BUCKET_ID_DOCUMENT}/files/${uploadImageFile.$id}/view?project=${PROJECT_ID}`
-                  : null,
                 email: user.email,
                 phone: user.phone,
                 name: user.name,
@@ -119,11 +85,15 @@ export const registerDoctor = async ({
                 identificationDocumentType:
                   doctor.doctorDetails.identificationDocumentType,
                 licenseNumber: doctor.doctorDetails.licenseNumber || null,
+                specialty: doctor.doctorDetails.specialty,
+                imageProfileId: uploadImageFile?.$id || null,
+                imageProfileUrl: uploadImageFile?.$id
+                  ? `${ENDPOINT}/storage/buckets/${BUCKET_ID_IMAGE}/files/${uploadImageFile.$id}/view?project=${PROJECT_ID}`
+                  : null,
                 identificationDocumentId: uploadDocumentFile?.$id || null,
                 identificationDocumentUrl: uploadDocumentFile?.$id
                   ? `${ENDPOINT}/storage/buckets/${BUCKET_ID_DOCUMENT}/files/${uploadDocumentFile.$id}/view?project=${PROJECT_ID}`
                   : null,
-                specialty: doctor.doctorDetails.specialty,
               },
             },
       },
@@ -144,5 +114,5 @@ export async function getDoctor(doctorId: string) {
 
 export async function getAllDoctors() {
   const doctors = await prisma.doctorDetails.findMany();
-  return doctors ? doctors : [];
+  return doctors || [];
 }

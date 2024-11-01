@@ -3,11 +3,11 @@ import "./globals.css";
 import { Plus_Jakarta_Sans as FontSans } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
+import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/providers/authprovider";
-import { Toaster } from "@/components/ui/toaster";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 
 const fontSans = FontSans({
   subsets: ["latin"],

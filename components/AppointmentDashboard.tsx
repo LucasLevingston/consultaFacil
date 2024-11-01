@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
+import Loading from "@/components/loading";
 import { StatCard } from "@/components/StatCard";
 import { columns } from "@/components/table/columns";
 import { DataTable } from "@/components/table/DataTable";
@@ -11,7 +13,6 @@ import {
 } from "@/lib/actions/appointment.actions";
 import { ExtendUser } from "@/next-auth";
 import { AppointmentCount, CompleteAppointment } from "@/types";
-import Loading from "@/components/loading";
 
 interface AppointmentsDashboardProps {
   user: ExtendUser;

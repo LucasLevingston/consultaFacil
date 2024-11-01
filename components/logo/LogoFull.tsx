@@ -1,11 +1,12 @@
-import Link from "next/link";
-import { Button } from "../ui/button";
 import Image from "next/image";
+import Link from "next/link";
+
+import { Button } from "../ui/button";
 
 export default function LogoFull() {
   return (
     <Button variant="ghost" className="">
-      <Link className="flex items-center justify-center p-4 gap-3" href="/">
+      <Link className="flex items-center justify-center gap-3 p-4" href="/">
         <Image
           src="/assets/icons/logo-icon.svg"
           height={1000}

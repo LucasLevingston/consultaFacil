@@ -1,29 +1,29 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Appointment, DoctorDetails, Status } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import DoctorCard from "@/app/profissionais/_components/doctorCard";
 import { SelectItem } from "@/components/ui/select";
 import { createAppointment, updateAppointment } from "@/lib/actions/appointment.actions";
 
 import "react-datepicker/dist/react-datepicker.css";
 
+import { ExtendUser } from "@/next-auth";
+import { CreateAppointmentParams, UpdateAppointmentParams } from "@/types";
+
 import CustomFormField, { FormFieldType } from "../../CustomFormField";
 import SubmitButton from "../../SubmitButton";
-import { Form } from "../../ui/form";
-import { Appointment, DoctorDetails, Status } from "@prisma/client";
-import { CreateAppointmentParams, UpdateAppointmentParams } from "@/types";
-import { ExtendUser } from "@/next-auth";
-import Image from "next/image";
-import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
-import { Phone, Mail, FileCheck, LocateIcon } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
 import { Badge } from "../../ui/badge";
-import Link from "next/link";
+import { Form } from "../../ui/form";
+
+
 import { getAppointmentSchema } from "./FormValidation";
+
 
 export const AppointmentForm = ({
   type = "create",
@@ -51,7 +51,7 @@ export const AppointmentForm = ({
     defaultValues: {
       doctorId: appointment ? appointment.doctorId : doctorId || "",
       schedule: appointment ? new Date(appointment.schedule) : new Date(),
-      reason: appointment ? appointment.reason ?? "" : "",
+      reason: appointment ? (appointment.reason ?? "") : "",
       note: appointment?.note ?? "",
       cancellationReason: "",
       userId: user.id,
@@ -98,7 +98,7 @@ export const AppointmentForm = ({
           appointment: {
             doctorId: values.doctorId,
             schedule: new Date(values.schedule),
-            status: status,
+            status,
             cancellationReason: values.cancellationReason,
           },
           type,
@@ -142,61 +142,7 @@ export const AppointmentForm = ({
         {type !== "cancel" && (
           <>
             {doctor ? (
-              <Card className="w-full max-w-sm dark:bg-dark-700 shadow-xl">
-                <CardHeader className="flex flex-row items-center gap-4">
-                  <Avatar className="h-16 w-16">
-                    {doctor.imageProfile && (
-                      <AvatarImage
-                        src={doctor.imageProfile}
-                        alt={doctor.name || "Doctor"}
-                        className="rounded-full"
-                      />
-                    )}
-                    <AvatarFallback>
-                      {doctor.name
-                        ? doctor.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                        : "DR"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <Link href={`/profissionais/${doctor.userId}`}>
-                      <CardTitle>Dr. {doctor.name || "Nome não informado"}</CardTitle>
-                    </Link>
-                    <Badge variant="secondary" className="mt-1">
-                      {doctor.specialty || "Especialidade não informada"}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="grid gap-2">
-                  {doctor.phone && (
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span>{doctor.phone}</span>
-                    </div>
-                  )}
-                  {doctor.email && (
-                    <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-muted-foreground" />
-                      <span>{doctor.email}</span>
-                    </div>
-                  )}
-                  {doctor.licenseNumber && (
-                    <div className="flex items-center gap-2">
-                      <FileCheck className="h-4 w-4 text-muted-foreground" />
-                      <span> {doctor.licenseNumber}</span>
-                    </div>
-                  )}
-                  {doctor.address && (
-                    <div className="flex items-center gap-2">
-                      <LocateIcon className="h-4 w-4 text-muted-foreground" />
-                      <span>Endereço: {doctor.address}</span>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <DoctorCard doctor={doctor} isActiveAppointmentButton={false} />
             ) : (
               <CustomFormField
                 fieldType={FormFieldType.SELECT}
@@ -210,16 +156,14 @@ export const AppointmentForm = ({
                     doctor.name && (
                       <SelectItem key={i} value={doctor.userId}>
                         <div className="flex cursor-pointer items-center gap-2">
-                          {doctor.imageProfile && (
-                            <Image
-                              src={doctor.imageProfile}
-                              width={32}
-                              height={32}
+                          {doctor.imageProfileUrl && (
+                            <img
+                              src={doctor.imageProfileUrl}
                               alt="doctor"
-                              className="rounded-full border border-dark-500"
+                              className="size-8 rounded-full border border-dark-500"
                             />
                           )}
-                          <p>Dr. {doctor.name}</p>
+                          <p>Dr. {doctor.name}</p> <Badge>{doctor.specialty}</Badge>
                         </div>
                       </SelectItem>
                     )

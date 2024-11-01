@@ -6,22 +6,24 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import CustomFormField, { FormFieldType } from "@/components/CustomFormField";
+import { FileUploader } from "@/components/FileUploader";
+import SubmitButton from "@/components/SubmitButton";
 import { Form, FormControl } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
-import { GenderOptions, IdentificationTypes } from "@/constants";
+import { GenderOptions, IdentificationTypes, specialties } from "@/constants";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "react-phone-number-input/style.css";
 
-import { Doctor, RegisterDoctorParams } from "@/types";
+import { toast } from "@/hooks/use-toast";
 import { registerDoctor } from "@/lib/actions/doctor.actions";
-import CustomFormField, { FormFieldType } from "@/components/CustomFormField";
-import { FileUploader } from "@/components/FileUploader";
-import SubmitButton from "@/components/SubmitButton";
+import { ExtendUser } from "@/next-auth";
+import { Doctor } from "@/types";
+
 import { getDefaultValues } from "./DefaultValues";
 import { DoctorFormValidation } from "./FormValidation";
-import { ExtendUser } from "@/next-auth";
-import { toast } from "@/hooks/use-toast";
+
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
@@ -30,7 +32,7 @@ interface DoctorDetailsProps {
   type: "edit" | "create";
 }
 
-const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
+function DoctorDetailsForm({ user, type }: DoctorDetailsProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const defaultValues = getDefaultValues(user);
@@ -45,28 +47,28 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
   const onSubmit = async (values: z.infer<typeof DoctorFormValidation>) => {
     setIsLoading(true);
 
-    let documentFormData;
-    if (values.identificationDocument && values.identificationDocument.length > 0) {
-      const blobFile = new Blob([values.identificationDocument[0]], {
-        type: values.identificationDocument[0].type,
-      });
-
-      documentFormData = new FormData();
-      documentFormData.append("blobFile", blobFile);
-      documentFormData.append("fileName", values.identificationDocument[0].name);
-    }
-    let imageFormData;
-    if (values.imageProfile && values.imageProfile.length > 0) {
-      const blobFile = new Blob([values.imageProfile[0]], {
-        type: values.imageProfile[0].type,
-      });
-
-      imageFormData = new FormData();
-      imageFormData.append("blobFile", blobFile);
-      imageFormData.append("fileName", values.imageProfile[0].name);
-    }
-
     try {
+      let documentFormData;
+      if (values.identificationDocument && values.identificationDocument.length > 0) {
+        const blobFile = new Blob([values.identificationDocument[0]], {
+          type: values.identificationDocument[0].type,
+        });
+
+        documentFormData = new FormData();
+        documentFormData.append("blobFile", blobFile);
+        documentFormData.append("fileName", values.identificationDocument[0].name);
+      }
+      let imageFormData;
+      if (values.imageProfile && values.imageProfile.length > 0) {
+        const blobFile = new Blob([values.imageProfile[0]], {
+          type: values.imageProfile[0].type,
+        });
+
+        imageFormData = new FormData();
+        imageFormData.append("blobFile", blobFile);
+        imageFormData.append("fileName", values.imageProfile[0].name);
+      }
+
       const doctor: Doctor = {
         id: user.id,
         emailVerified: user.emailVerified,
@@ -102,6 +104,7 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
           : undefined,
         imageFile: values.imageProfile ? imageFormData : undefined,
       });
+
       if (newDoctor) {
         toast({ title: "Dados salvos com sucesso!" });
         if (type === "create") {
@@ -111,7 +114,8 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
         }
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      toast({ title: "Erro ao salvar os dados", variant: "destructive" });
     }
 
     setIsLoading(false);
@@ -124,8 +128,8 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
           <div className="mb-9 space-y-1">
             <h2 className="sub-header">Informações Pessoais</h2>
           </div>
-          <div className="flex items-center gap-6 w-full">
-            <div className="flex flex-row gap-6 xl:flex-col min-w-[50%]">
+          <div className="flex w-full items-center gap-6">
+            <div className="flex min-w-[50%] flex-row gap-6 xl:flex-col">
               <CustomFormField
                 fieldType={FormFieldType.INPUT}
                 control={form.control}
@@ -149,10 +153,10 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
                 control={form.control}
                 name="phone"
                 label="Número de Telefone"
-                placeholder="(555) 123-4567"
+                placeholder="+55 (85) 99123-4567"
               />
             </div>
-            <div className="flex flex-row gap-6 xl:flex-col min-w-[50%]">
+            <div className="flex min-w-[50%] flex-row gap-6 xl:flex-col">
               <CustomFormField
                 fieldType={FormFieldType.SKELETON}
                 control={form.control}
@@ -161,6 +165,7 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
                 renderSkeleton={(field) => (
                   <FormControl>
                     <FileUploader
+                      currentFile={user.image!!}
                       files={field.value}
                       onChange={field.onChange}
                       imageProfile
@@ -212,19 +217,25 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
           <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
-            name="adress"
+            name="address"
             label="Endereço"
             placeholder="Rua visconde neto 35 - Patos, PB"
           />
           <h2 className="sub-header">Informações pessoais</h2>
           <div className="flex flex-col gap-6 xl:flex-row">
             <CustomFormField
-              fieldType={FormFieldType.INPUT}
+              fieldType={FormFieldType.SELECT}
               control={form.control}
               name="specialty"
               label="Especialidade"
               placeholder="Cardiologia"
-            />
+            >
+              {specialties.map((speciality, i) => (
+                <SelectItem key={speciality + i} value={speciality}>
+                  {speciality}
+                </SelectItem>
+              ))}
+            </CustomFormField>
 
             <CustomFormField
               fieldType={FormFieldType.INPUT}
@@ -242,7 +253,7 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
                 <CustomFormField
                   fieldType={FormFieldType.SELECT}
                   control={form.control}
-                  name="identificationType"
+                  name="identificationDocumentType"
                   label="Tipo de Identificação"
                   placeholder="Selecione o tipo de identificação"
                 >
@@ -286,6 +297,6 @@ const DoctorDetailsForm = ({ user, type }: DoctorDetailsProps) => {
       </form>
     </Form>
   );
-};
+}
 
 export default DoctorDetailsForm;

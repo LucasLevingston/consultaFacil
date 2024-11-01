@@ -3,9 +3,10 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { getAppointment } from "@/lib/actions/appointment.actions";
+import { getDoctor } from "@/lib/actions/doctor.actions";
 import { formatDateTime } from "@/lib/utils";
 import { SearchParamProps } from "@/types";
-import { getAllDoctors, getDoctor } from "@/lib/actions/doctor.actions";
+import LogoFull from "@/components/logo/LogoFull";
 
 const RequestSuccess = async ({ searchParams }: SearchParamProps) => {
   const appointmentId = (searchParams?.appointmentId as string) || "";
@@ -18,15 +19,7 @@ const RequestSuccess = async ({ searchParams }: SearchParamProps) => {
   return (
     <div className=" flex h-screen max-h-screen px-[5%]">
       <div className="success-img">
-        <Link href="/">
-          <Image
-            src="/assets/icons/logo-full.svg"
-            height={1000}
-            width={1000}
-            alt="logo"
-            className="h-10 w-fit"
-          />
-        </Link>
+        <LogoFull />
 
         <section className="flex flex-col items-center">
           <Image src="/assets/gifs/success.gif" height={300} width={280} alt="sucesso" />
@@ -40,13 +33,13 @@ const RequestSuccess = async ({ searchParams }: SearchParamProps) => {
         <section className="request-details">
           <p>Detalhes da solicitação de consulta: </p>
           <div className="flex items-center gap-3">
-            {doctor?.imageProfile && (
-              <Image
-                src={doctor?.imageProfile!}
+            {doctor?.imageProfileUrl && (
+              <img
+                src={doctor?.imageProfileUrl!}
                 alt="médico"
                 width={100}
                 height={100}
-                className="size-6"
+                className="size-6 rounded-full h-12 w-12"
               />
             )}
             <p className="whitespace-nowrap">Dr. {doctor?.name}</p>
@@ -62,11 +55,9 @@ const RequestSuccess = async ({ searchParams }: SearchParamProps) => {
           </div>
         </section>
 
-        <Button variant="outline" className="shad-primary-btn" asChild>
+        <Button variant="outline" className="shad-primary-btn font-bold" asChild>
           <Link href={`/agendar-consulta`}>Nova Consulta</Link>
         </Button>
-
-        <p className="copyright">© 2024 CarePluse</p>
       </div>
     </div>
   );

@@ -4,12 +4,12 @@ import { Label } from "@/components/ui/label";
 
 export function ContactSection() {
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
+    <section className="w-full bg-gray-100 py-12 dark:bg-gray-800 md:py-24 lg:py-32">
       <div className="container px-4 md:px-6">
-        <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8">
+        <h2 className="mb-8 text-center text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
           Entre em Contato
         </h2>
-        <div className="max-w-md mx-auto">
+        <div className="mx-auto max-w-md">
           <form className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Nome</Label>
@@ -23,7 +23,7 @@ export function ContactSection() {
               <Label htmlFor="message">Mensagem</Label>
               <textarea
                 id="message"
-                className="w-full min-h-[100px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring min-h-[100px] w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder="Sua mensagem aqui"
               />
             </div>

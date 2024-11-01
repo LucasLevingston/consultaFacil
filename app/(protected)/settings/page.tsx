@@ -1,14 +1,14 @@
+import { redirect } from "next/navigation";
+
 import { auth } from "@/auth";
 import DoctorDetailsForm from "@/components/forms/DoctorDetails/DoctorDetailsForm";
 import PatientDetailsForm from "@/components/forms/PatientDetails/PatientDetailsForm";
-import { getUserByEmail } from "@/lib/actions/user.actions";
-import { redirect } from "next/navigation";
 
 export default async function Page() {
   const session = await auth();
 
   if (!session?.user?.isDone) {
-    redirect("/auth/complete-profile");
+    redirect("/auth/completar-cadastro");
   }
 
   return session?.user?.role === "doctor" ? (

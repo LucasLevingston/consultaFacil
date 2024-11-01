@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { DoctorDetails } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
+import { getAllDoctors } from "@/lib/actions/doctor.actions";
 import { formatDateTime } from "@/lib/utils";
+import { ExtendUser } from "@/next-auth";
+import { CompleteAppointment } from "@/types";
+
 import { AppointmentModal } from "../AppointmentModal";
 import { StatusBadge } from "../StatusBadge";
-import { CompleteAppointment } from "@/types";
-import { getAllDoctors } from "@/lib/actions/doctor.actions";
-import { DoctorDetails } from "@prisma/client";
-import { ExtendUser } from "@/next-auth";
-import { useSession } from "next-auth/react";
-import { auth } from "@/auth";
 
 export const columns: ColumnDef<CompleteAppointment>[] = [
   {
@@ -91,13 +91,11 @@ export const columns: ColumnDef<CompleteAppointment>[] = [
           ) : (
             doctor && (
               <>
-                {doctor.imageProfile && (
-                  <Image
-                    src={doctor.imageProfile}
+                {doctor.imageProfileUrl && (
+                  <img
+                    src={doctor.imageProfileUrl}
                     alt="Médico"
-                    width={100}
-                    height={100}
-                    className="size-8"
+                    className="size-12  rounded-full object-cover"
                   />
                 )}
                 <p className="whitespace-nowrap">Dr. {doctor.name}</p>

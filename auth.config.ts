@@ -1,10 +1,9 @@
-import GitHub from "next-auth/providers/github";
 import type { NextAuthConfig } from "next-auth";
-import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
+import GitHub from "next-auth/providers/github";
+import Google from "next-auth/providers/google";
+
 import { LoginFormValidation } from "./lib/validation";
-import { authRoutes, publicRoutes } from "./routes";
-import { getUser } from "./lib/actions/user.actions";
 
 export default {
   providers: [
@@ -16,7 +15,6 @@ export default {
     Credentials({
       async authorize(credentials) {
         const validatedFields = LoginFormValidation.safeParse(credentials);
-        console.log(validatedFields);
         if (validatedFields.success) {
           const { email } = validatedFields.data;
 

@@ -16,6 +16,7 @@ import { AppointmentForm } from "./forms/Appointments/AppointmentForm";
 
 import "react-datepicker/dist/react-datepicker.css";
 import { Appointment, DoctorDetails } from "@prisma/client";
+
 import { ExtendUser } from "@/next-auth";
 
 export const AppointmentModal = async ({

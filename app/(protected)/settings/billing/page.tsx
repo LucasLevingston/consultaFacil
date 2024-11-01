@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,16 +7,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 
 export default async function Page() {
-  const session = await auth();
   // const plan = await getUserCurrentPlan(session?.user.id as string);
 
   return (
     <form>
       <Card>
-        <CardHeader className="border-b border-border">
+        <CardHeader className="border-border border-b">
           <CardTitle>Uso do Plano</CardTitle>
           <CardDescription>
             Você está atualmente no{" "}
@@ -37,7 +34,7 @@ export default async function Page() {
             <main>{/* <Progress value={plan.quota.TASKS.usage} /> */}</main>
           </div>
         </CardContent>
-        <CardFooter className="flex items-center justify-between border-t border-border pt-6">
+        <CardFooter className="border-border flex items-center justify-between border-t pt-6">
           <span>Para um maior limite, assine o PRO</span>
           <Button type="submit">Assine por R$89/ mês</Button>
         </CardFooter>

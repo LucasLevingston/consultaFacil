@@ -1,16 +1,20 @@
 "use server";
 
-import { auth } from "@/auth";
-import Link from "next/link";
 import {
   LogOut,
   Settings,
   CalendarCheck,
   CalendarCheck2,
-  CircleUser,
   User,
   Stethoscope,
 } from "lucide-react";
+import Link from "next/link";
+
+import { auth } from "@/auth";
+
+import LogoFull from "./logo/LogoFull";
+import LogOutButton from "./LogOutButton";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -21,36 +25,35 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
 } from "./ui/dropdown-menu";
-import { Input } from "./ui/input";
-import LogoFull from "./logo/LogoFull";
-import LogOutButton from "./LogOutButton";
 
 export async function Header() {
   const session = await auth();
 
   return (
-    <header className=" top-0 flex h-16 items-center gap-4 border-b px-4 md:px-6 bg-white dark:bg-dark-200">
+    <header className=" top-0 flex h-16 items-center gap-4 border-b bg-white px-4 dark:bg-dark-200 md:px-6">
       <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-3 md:text-sm lg:gap-4">
         <LogoFull />
         <Link
           href="/"
-          className="text-foreground transition-colors hover:text-foreground"
+          className="text-foreground hover:text-foreground transition-colors"
         >
           <Button variant="ghost" className="flex gap-2">
             Início
           </Button>
         </Link>
-        <Link
-          href="/agendar-consulta"
-          className="text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <Button variant="ghost" className="flex gap-2">
-            Agendar consulta
-          </Button>
-        </Link>
+        {session?.user.role != "doctor" && (
+          <Link
+            href="/agendar-consulta"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Button variant="ghost" className="flex gap-2">
+              Agendar consulta
+            </Button>
+          </Link>
+        )}
         <Link
           href="/consultas"
-          className="text-muted-foreground transition-colors hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground transition-colors"
         >
           <Button variant="ghost" className="flex gap-2">
             Minhas consultas
@@ -58,7 +61,7 @@ export async function Header() {
         </Link>
         <Link
           href="/profissionais"
-          className="text-muted-foreground transition-colors hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground transition-colors"
         >
           <Button variant="ghost" className="flex gap-2">
             Profissionais
@@ -66,7 +69,7 @@ export async function Header() {
         </Link>
         <Link
           href="/clinicas"
-          className="text-muted-foreground transition-colors hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground transition-colors"
         >
           <Button variant="ghost" className="flex gap-2">
             Clinicas e organizações
@@ -86,8 +89,10 @@ export async function Header() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
-              <CircleUser className="h-5 w-5" />
-              <span className="sr-only">Toggle user menu</span>
+              <Avatar>
+                {session?.user.image && <AvatarImage src={session?.user?.image} />}
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>{" "}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -101,13 +106,13 @@ export async function Header() {
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild>
                     <Link href="/consultas" className="flex items-center">
-                      <CalendarCheck className="mr-2 h-4 w-4" />
+                      <CalendarCheck className="mr-2 size-4" />
                       <span>Ver minhas consultas</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/agendar-consulta" className="flex items-center">
-                      <CalendarCheck2 className="mr-2 h-4 w-4" />
+                      <CalendarCheck2 className="mr-2 size-4" />
                       <span>Agendar consulta</span>
                     </Link>
                   </DropdownMenuItem>
@@ -116,7 +121,7 @@ export async function Header() {
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild>
                     <Link href="/settings" className="flex items-center">
-                      <Settings className="mr-2 h-4 w-4" />
+                      <Settings className="mr-2 size-4" />
                       <span>Configurações</span>
                     </Link>
                   </DropdownMenuItem>
@@ -126,7 +131,7 @@ export async function Header() {
             ) : (
               <DropdownMenuItem asChild>
                 <Link href="/auth" className="flex items-center">
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <LogOut className="mr-2 size-4" />
                   <span>Logar ou criar conta</span>
                 </Link>
               </DropdownMenuItem>

@@ -18,6 +18,7 @@ const DoctorDetailsPage = async ({ params }: { params: { doctorId: string } }) =
   return (
     <div>
       <h1>Detalhes do Doutor</h1>
+
       <h2>{doctor.name}</h2>
       <p>Especialidade: {doctor.specialty}</p>
       <p>Contato: {doctor.phone}</p>

@@ -1,13 +1,13 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { CreateUserParams, Doctor, Patient, RegisterPatientParams } from "@/types";
-import { comparePassword, hashPassword } from "../utils";
-import { PatientDetails, DoctorDetails, User } from "@prisma/client";
-import { SignInResponse } from "next-auth/react";
+import { User } from "@prisma/client";
+
 import { signIn, signOut } from "@/auth";
-import { AuthError } from "next-auth";
+import { prisma } from "@/lib/prisma";
 import { ExtendUser } from "@/next-auth";
+import { CreateUserParams } from "@/types";
+
+import { comparePassword, hashPassword } from "../utils";
 
 export const getUserByEmail = async (email: string) => {
   return await prisma.user.findUnique({

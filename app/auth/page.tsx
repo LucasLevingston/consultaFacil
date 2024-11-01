@@ -1,23 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 
 import { UserForm } from "@/components/forms/UserForm";
-import { PasskeyModal } from "@/components/PasskeyModal";
-import { SearchParamProps } from "@/types";
-import LogoFull from "@/components/logo/LogoFull";
-import LogoIcon from "@/components/logo/LogoIcon";
+import HeaderSection from "@/components/HeaderSection";
 
 const Home = () => {
   return (
     <div className="flex h-screen max-h-screen">
       <section className="remove-scrollbar container my-auto">
+        <HeaderSection label={`Autenticação`} />
         <div className="sub-container max-w-[496px]">
-          <div className="text-left justify-start">
-            <LogoIcon />
-          </div>
-
           <UserForm />
         </div>
       </section>

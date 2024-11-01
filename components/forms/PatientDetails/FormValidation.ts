@@ -33,8 +33,9 @@ export const PatientFormValidation = z.object({
   familyMedicalHistory: z.string(),
   pastMedicalHistory: z.string(),
   identificationDocumentType: z.string(),
-  cpf: z.string(),
+  cpf: z.string().min(1, "CPF é obrigatório."),
   identificationDocument: z.custom<File[]>().optional(),
+  imageProfile: z.custom<File[]>().optional() || z.string().optional(),
   treatmentConsent: z
     .boolean()
     .default(false)

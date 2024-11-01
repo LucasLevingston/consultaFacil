@@ -1,11 +1,12 @@
 "use client";
 
+import { usePathname } from "next/navigation";
+
 import {
   DashboardSidebarNav,
   DashboardSidebarNavLink,
   DashboardSidebarNavMain,
 } from "@/components/dashboard/sidebar";
-import { usePathname } from "next/navigation";
 
 export function SettingsSidebar() {
   const pathname = usePathname();

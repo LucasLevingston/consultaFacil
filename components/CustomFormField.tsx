@@ -1,9 +1,12 @@
 /* eslint-disable no-unused-vars */
 import { E164Number } from "libphonenumber-js/core";
+import { Mail, User } from "lucide-react";
 import Image from "next/image";
 import ReactDatePicker from "react-datepicker";
 import { Control } from "react-hook-form";
 import PhoneInput from "react-phone-number-input";
+
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   FormControl,
   FormField,
@@ -19,8 +22,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, User } from "lucide-react";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -51,7 +52,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
   switch (props.fieldType) {
     case FormFieldType.INPUT:
       return (
-        <div className="flex items-center rounded-md border px-2  border-dark-500 dark:bg-dark-400">
+        <div className="flex items-center rounded-md border border-dark-500  px-2 dark:bg-dark-400">
           {props.name === "name" && <User className=" text-black dark:text-white" />}
           {props.name === "email" && <Mail className=" text-black dark:text-white" />}
           <FormControl>
@@ -106,7 +107,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
       );
     case FormFieldType.DATE_PICKER:
       return (
-        <div className="flex items-center rounded-md border border-dark-500 dark:bg-dark-400 p-2">
+        <div className="flex items-center rounded-md border border-dark-500 p-2 dark:bg-dark-400">
           <Image
             src="/assets/icons/calendar.svg"
             height={24}
@@ -122,7 +123,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
               timeInputLabel="Time:"
               dateFormat={props.dateFormat ?? "MM/dd/yyyy"}
               wrapperClassName="date-picker"
-              className={`react-datepicker bg-dark-400 text-white   rounded-md p-2 outline-none`}
+              className={`react-datepicker rounded-md bg-dark-400   p-2 text-white outline-none`}
             />
           </FormControl>
         </div>

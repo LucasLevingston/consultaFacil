@@ -8,6 +8,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Image from "next/image";
+
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -17,8 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ExtendUser } from "@/next-auth";
-import { DoctorDetails } from "@prisma/client";
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData, any>[]; // Use 'any' for generic values
@@ -69,7 +68,7 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                Sem resultados.
               </TableCell>
             </TableRow>
           )}

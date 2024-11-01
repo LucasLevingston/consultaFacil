@@ -1,34 +1,43 @@
 "use server";
 
-import { ID, InputFile } from "node-appwrite";
-import { BUCKET_ID, ENDPOINT, PROJECT_ID, storage } from "../appwrite.config";
 import { prisma } from "@/lib/prisma";
 import { RegisterPatientParams } from "@/types";
+
+import {
+  BUCKET_ID_DOCUMENT,
+  BUCKET_ID_IMAGE,
+  ENDPOINT,
+  PROJECT_ID,
+} from "../appwrite.config";
+
+import { createDocument } from "./bucket-actions/createDocument";
+import { createImageProfile } from "./bucket-actions/createImageProfile";
 import { getUser } from "./user.actions";
-import { User } from "lucide-react";
 
 export const registerPatient = async ({
   identificationDocument,
+  imageFile,
   ...patient
 }: RegisterPatientParams) => {
   try {
-    let file;
+    let uploadImageFile;
+    let uploadDocumentFile;
     const existingPatientDetails = await prisma.patientDetails.findUnique({
       where: { userId: patient.id },
     });
-    if (!existingPatientDetails) {
-      if (identificationDocument) {
-        const inputFile = InputFile.fromBlob(
-          identificationDocument.get("blobFile") as Blob,
-          identificationDocument.get("fileName") as string
-        );
 
-        file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
-      }
+    const documentId = existingPatientDetails?.identificationDocumentId;
+    if (identificationDocument) {
+      if (documentId)
+        uploadDocumentFile = await createDocument(identificationDocument, documentId);
+      else if (!documentId) createDocument(identificationDocument);
+    }
 
-      if (!file) {
-        throw new Error("Error creating file.");
-      }
+    const imageId = existingPatientDetails?.imageProfileId;
+    if (imageFile) {
+      console.log(imageFile);
+      if (imageId) uploadImageFile = await createImageProfile(imageFile, imageId);
+      else if (!imageId) uploadImageFile = await createImageProfile(imageFile);
     }
 
     const user = await getUser(patient.id);
@@ -44,9 +53,12 @@ export const registerPatient = async ({
         emailVerified: user.emailVerified,
         phone: patient.phone || user.phone,
         password: user.password,
-        image: user.image,
         isDone: true,
         role: "patient",
+        imageId: uploadImageFile?.$id || null,
+        image: uploadImageFile?.$id
+          ? `${ENDPOINT}/storage/buckets/${BUCKET_ID_IMAGE}/files/${uploadImageFile.$id}/view?project=${PROJECT_ID}`
+          : null,
         patientDetails: existingPatientDetails
           ? {
               update: {
@@ -67,6 +79,10 @@ export const registerPatient = async ({
                 email: patient.patientDetails.email,
                 phone: patient.patientDetails.phone,
                 name: patient.patientDetails.name,
+                imageProfileId: uploadImageFile?.$id || null,
+                imageProfileUrl: uploadImageFile?.$id
+                  ? `${ENDPOINT}/storage/buckets/${BUCKET_ID_IMAGE}/files/${uploadImageFile.$id}/view?project=${PROJECT_ID}`
+                  : null,
               },
             }
           : {
@@ -88,9 +104,13 @@ export const registerPatient = async ({
                 cpf: patient.patientDetails.cpf,
                 disclosureConsent: patient.patientDetails.disclosureConsent,
                 treatmentConsent: patient.patientDetails.treatmentConsent,
-                identificationDocumentId: file?.$id || null,
-                identificationDocumentUrl: file?.$id
-                  ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}`
+                imageProfileId: uploadImageFile?.$id || null,
+                imageProfileUrl: uploadImageFile?.$id
+                  ? `${ENDPOINT}/storage/buckets/${BUCKET_ID_IMAGE}/files/${uploadImageFile.$id}/view?project=${PROJECT_ID}`
+                  : null,
+                identificationDocumentId: uploadDocumentFile?.$id || null,
+                identificationDocumentUrl: uploadDocumentFile?.$id
+                  ? `${ENDPOINT}/storage/buckets/${BUCKET_ID_DOCUMENT}/files/${uploadDocumentFile.$id}/view?project=${PROJECT_ID}`
                   : null,
               },
             },

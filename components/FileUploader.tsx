@@ -10,9 +10,15 @@ type FileUploaderProps = {
   files: File[] | undefined;
   onChange: (files: File[]) => void;
   imageProfile?: boolean;
+  currentFile?: string;
 };
 
-export const FileUploader = ({ files, onChange, imageProfile }: FileUploaderProps) => {
+export const FileUploader = ({
+  files,
+  onChange,
+  imageProfile,
+  currentFile,
+}: FileUploaderProps) => {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     onChange(acceptedFiles);
   }, []);
@@ -22,7 +28,7 @@ export const FileUploader = ({ files, onChange, imageProfile }: FileUploaderProp
   return (
     <div
       {...getRootProps()}
-      className={`text-[12px] font-regular flex cursor-pointer  flex-col items-center justify-center gap-3 rounded-md ${files && files?.length > 0 && !imageProfile && "border border-dashed"} border-dark-500 dark:bg-dark-400 p-5`}
+      className={`font-regular flex cursor-pointer flex-col  items-center justify-center gap-3 rounded-md text-[12px] ${files && files?.length > 0 && !imageProfile && "border border-dashed"} border-dark-500 p-5 dark:bg-dark-400`}
     >
       <input {...getInputProps()} />
       {files && files?.length > 0 ? (
@@ -45,7 +51,13 @@ export const FileUploader = ({ files, onChange, imageProfile }: FileUploaderProp
         )
       ) : (
         <>
-          <Image src="/assets/icons/upload.svg" width={40} height={40} alt="upload" />
+          <img
+            src={currentFile || "/assets/icons/upload.svg"}
+            width={40}
+            height={40}
+            alt="upload"
+            className="max-h-[400px] rounded-full object-cover"
+          />
           <div className="file-upload_label">
             <p className="text-14-regular ">
               <span className="text-green-500">Clique pra fazer o upload </span>

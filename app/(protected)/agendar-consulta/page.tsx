@@ -1,23 +1,28 @@
 import Image from "next/image";
-import { AppointmentForm } from "@/components/forms/Appointments/AppointmentForm";
-import { getAllDoctors } from "@/lib/actions/doctor.actions";
+import { redirect } from "next/navigation";
+
 import { auth } from "@/auth";
+import { AppointmentForm } from "@/components/forms/Appointments/AppointmentForm";
+import HeaderSection from "@/components/HeaderSection";
+import { getAllDoctors } from "@/lib/actions/doctor.actions";
 import { ExtendUser } from "@/next-auth";
-import LogoFull from "@/components/logo/LogoFull";
+
 
 const Appointment = async () => {
   const session = await auth();
   const doctors = await getAllDoctors();
 
+  if (!session?.user?.isDone) {
+    redirect("/auth/completar-cadastro");
+  }
+  if (session?.user?.role === "doctor") {
+    redirect("/");
+  }
+
   return (
     <div className="flex h-screen max-h-screen">
       <section className="remove-scrollbar container my-auto">
-        <header className="admin-header">
-          <LogoFull />
-          <p className="text-16-semibold">
-            <span>Agendar Consulta</span>
-          </p>
-        </header>
+        <HeaderSection label={"Agendar consulta"} />
         <div className="sub-container max-w-[860px] flex-1 justify-between">
           <AppointmentForm
             type="create"

@@ -1,17 +1,18 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, User, Phone } from "lucide-react";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function FeaturesSection() {
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 ">
       <div className="container px-4 md:px-6">
-        <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8">
+        <h2 className="mb-8 text-center text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
           Recursos do ConsultaFácil
         </h2>
         <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3">
           <Card className="dark:bg-dark-500">
             <CardHeader>
-              <Calendar className="h-12 w-12 mb-4 text-primary" />
+              <Calendar className="text-primary mb-4 size-12" />
               <CardTitle>Agendamento Flexível</CardTitle>
             </CardHeader>
             <CardContent>
@@ -22,7 +23,7 @@ export function FeaturesSection() {
           </Card>
           <Card className="dark:bg-dark-500">
             <CardHeader>
-              <User className="h-12 w-12 mb-4 text-primary" />
+              <User className="text-primary mb-4 size-12" />
               <CardTitle>Perfil do Médico</CardTitle>
             </CardHeader>
             <CardContent>
@@ -33,7 +34,7 @@ export function FeaturesSection() {
           </Card>
           <Card className="dark:bg-dark-500">
             <CardHeader>
-              <Phone className="h-12 w-12 mb-4 text-primary" />
+              <Phone className="text-primary mb-4 size-12" />
               <CardTitle>Lembretes por SMS</CardTitle>
             </CardHeader>
             <CardContent>

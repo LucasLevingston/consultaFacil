@@ -2,13 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 
-import { countAppointments, parseStringify } from "../utils";
+import { prisma } from "@/lib/prisma";
 import {
   AppointmentCount,
   CreateAppointmentParams,
   UpdateAppointmentParams,
 } from "@/types";
-import { prisma } from "@/lib/prisma";
+
+import { countAppointments, parseStringify } from "../utils";
 
 export const createAppointment = async (appointment: CreateAppointmentParams) => {
   return await prisma.appointment.create({

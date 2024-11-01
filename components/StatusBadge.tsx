@@ -1,8 +1,8 @@
+import { Status } from "@prisma/client";
 import clsx from "clsx";
 import Image from "next/image";
 
 import { StatusIcon } from "@/constants";
-import { Status } from "@prisma/client";
 
 export const StatusBadge = ({ status }: { status: Status }) => {
   const renderStatus = (status: Status) => {

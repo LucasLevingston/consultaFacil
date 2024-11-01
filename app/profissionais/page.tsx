@@ -1,11 +1,12 @@
 import { getAllDoctors } from "@/lib/actions/doctor.actions";
+
 import DoctorCard from "./_components/doctorCard";
 
 const Home = async () => {
   const doctors = await getAllDoctors();
 
   return (
-    <div className="h-full w-full flex flex-col p-12 gap-4">
+    <div className="flex size-full flex-col gap-4 p-12">
       <p className="text-2xl font-bold ">
         Lista de profissionais cadastrados na nossa plataforma
       </p>

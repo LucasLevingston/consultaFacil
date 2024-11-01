@@ -1,17 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTheme } from "next-themes";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { SheetFooter } from "@/components/ui/sheet";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,10 +13,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { themeFormSchema } from "./schemas";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useTheme } from "next-themes";
+import { SheetFooter } from "@/components/ui/sheet";
 import { toast } from "@/hooks/use-toast";
+
+import { themeFormSchema } from "./schemas";
 
 export function ThemeForm() {
   const theme = useTheme();
@@ -70,7 +72,7 @@ export function ThemeForm() {
                           <RadioGroupItem value="light" className="hidden" />
                         </FormControl>
                         <div
-                          className={`items-center cursor-pointer rounded-md border-[3px] border-muted p-1 hover:border-accent ${field.value === "light" && "border-mainColor"}`}
+                          className={`border-muted hover:border-accent cursor-pointer items-center rounded-md border-[3px] p-1 ${field.value === "light" && "border-mainColor"}`}
                         >
                           {" "}
                           <div className="space-y-2 rounded-sm bg-[#ecedef] p-2">
@@ -79,11 +81,11 @@ export function ThemeForm() {
                               <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
                             </div>
                             <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-sm">
-                              <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
+                              <div className="size-4 rounded-full bg-[#ecedef]" />
                               <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
                             </div>
                             <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-sm">
-                              <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
+                              <div className="size-4 rounded-full bg-[#ecedef]" />
                               <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
                             </div>
                           </div>
@@ -99,7 +101,7 @@ export function ThemeForm() {
                           <RadioGroupItem value="dark" className="hidden" />
                         </FormControl>
                         <div
-                          className={`items-center cursor-pointer rounded-md border-[3px] border-muted p-1 hover:border-accent ${field.value === "dark" ? "border-mainColor" : ""}`}
+                          className={`border-muted hover:border-accent cursor-pointer items-center rounded-md border-[3px] p-1 ${field.value === "dark" ? "border-mainColor" : ""}`}
                         >
                           <div className="space-y-2 rounded-sm bg-slate-950 p-2">
                             <div className="space-y-2 rounded-md bg-slate-800 p-2 shadow-sm">
@@ -107,11 +109,11 @@ export function ThemeForm() {
                               <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
                             </div>
                             <div className="flex items-center space-x-2 rounded-md bg-slate-800 p-2 shadow-sm">
-                              <div className="h-4 w-4 rounded-full bg-slate-400" />
+                              <div className="size-4 rounded-full bg-slate-400" />
                               <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
                             </div>
                             <div className="flex items-center space-x-2 rounded-md bg-slate-800 p-2 shadow-sm">
-                              <div className="h-4 w-4 rounded-full bg-slate-400" />
+                              <div className="size-4 rounded-full bg-slate-400" />
                               <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
                             </div>
                           </div>

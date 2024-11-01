@@ -14,10 +14,6 @@ declare interface CreateUserParams {
   role: "doctor" | "patient" | "admin";
 }
 
-declare interface RegisterPatientParams extends Patient {
-  identificationDocument?: FormData;
-}
-
 declare type CreateAppointmentParams = {
   doctorId: string;
   patientId: string;
@@ -36,6 +32,11 @@ declare type UpdateAppointmentParams = {
   };
   type: "schedule" | "cancel"; // Use tipos literais
 };
+
+declare interface RegisterPatientParams extends Patient {
+  identificationDocument?: FormData;
+  imageFile?: FormData;
+}
 
 export interface RegisterDoctorParams extends Doctor {
   identificationDocument?: FormData;

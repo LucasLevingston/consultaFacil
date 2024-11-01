@@ -15,12 +15,15 @@ import { registerPatient } from "@/lib/actions/patient.actions";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "react-phone-number-input/style.css";
+import { Patient } from "@/types";
+
 import CustomFormField, { FormFieldType } from "../../CustomFormField";
 import { FileUploader } from "../../FileUploader";
 import SubmitButton from "../../SubmitButton";
-import { Patient } from "@/types";
+
 import { getDefaultValues } from "./DefaultValues";
 import { PatientFormValidation } from "./FormValidation";
+
 import { toast } from "@/hooks/use-toast";
 
 interface PatientDetailsProps {
@@ -43,18 +46,28 @@ const PatientDetailsForm = ({ user, type }: PatientDetailsProps) => {
   const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
     setIsLoading(true);
 
-    let formData;
-    if (values.identificationDocument && values.identificationDocument?.length > 0) {
-      const blobFile = new Blob([values.identificationDocument[0]], {
-        type: values.identificationDocument[0].type,
-      });
-
-      formData = new FormData();
-      formData.append("blobFile", blobFile);
-      formData.append("fileName", values.identificationDocument[0].name);
-    }
-
     try {
+      let documentFormData;
+      if (values.identificationDocument && values.identificationDocument.length > 0) {
+        const blobFile = new Blob([values.identificationDocument[0]], {
+          type: values.identificationDocument[0].type,
+        });
+
+        documentFormData = new FormData();
+        documentFormData.append("blobFile", blobFile);
+        documentFormData.append("fileName", values.identificationDocument[0].name);
+      }
+      let imageFormData;
+      if (values.imageProfile && values.imageProfile.length > 0) {
+        const blobFile = new Blob([values.imageProfile[0]], {
+          type: values.imageProfile[0].type,
+        });
+
+        imageFormData = new FormData();
+        imageFormData.append("blobFile", blobFile);
+        imageFormData.append("fileName", values.imageProfile[0].name);
+      }
+
       const patient: Patient = {
         id: user.id,
         emailVerified: user.emailVerified,
@@ -89,10 +102,15 @@ const PatientDetailsForm = ({ user, type }: PatientDetailsProps) => {
           imageProfileUrl: user.patientDetails?.imageProfileUrl || null,
         },
       };
+
       const newPatient = await registerPatient({
         ...patient,
-        identificationDocument: values.identificationDocument ? formData : undefined,
+        identificationDocument: values.identificationDocument
+          ? documentFormData
+          : undefined,
+        imageFile: values.imageProfile ? imageFormData : undefined,
       });
+
       if (newPatient) {
         toast({ title: "Dados salvos com sucesso!" });
         if (type === "create") {
@@ -116,69 +134,77 @@ const PatientDetailsForm = ({ user, type }: PatientDetailsProps) => {
             <h2 className="sub-header">Informações Pessoais</h2>
           </div>
 
-          <CustomFormField
-            fieldType={FormFieldType.INPUT}
-            control={form.control}
-            name="name"
-            placeholder="João da Silva"
-            iconSrc="/assets/icons/user.svg"
-            iconAlt="usuário"
-          />
-
-          <div className="flex flex-col gap-6 xl:flex-row">
-            <CustomFormField
-              fieldType={FormFieldType.INPUT}
-              control={form.control}
-              name="email"
-              label="Endereço de E-mail"
-              placeholder="joaodasilva@gmail.com"
-              iconSrc="/assets/icons/email.svg"
-              iconAlt="email"
-            />
-
-            <CustomFormField
-              fieldType={FormFieldType.PHONE_INPUT}
-              control={form.control}
-              name="phone"
-              label="Número de Telefone"
-              placeholder="(555) 123-4567"
-            />
+          <div className="flex w-full items-center gap-6">
+            <div className="flex min-w-[50%] flex-row gap-6 xl:flex-col">
+              <CustomFormField
+                fieldType={FormFieldType.INPUT}
+                control={form.control}
+                name="name"
+                label="Nome completo"
+                placeholder="João da Silva"
+                iconSrc="/assets/icons/user.svg"
+                iconAlt="usuário"
+              />{" "}
+              <CustomFormField
+                fieldType={FormFieldType.INPUT}
+                control={form.control}
+                name="email"
+                label="Endereço de E-mail"
+                placeholder="joaodasilva@gmail.com"
+                iconSrc="/assets/icons/email.svg"
+                iconAlt="email"
+              />{" "}
+              <CustomFormField
+                fieldType={FormFieldType.PHONE_INPUT}
+                control={form.control}
+                name="phone"
+                label="Número de Telefone"
+                placeholder="(555) 123-4567"
+              />
+            </div>
+            <div className="flex min-w-[50%] flex-row gap-6 xl:flex-col">
+              <CustomFormField
+                fieldType={FormFieldType.SKELETON}
+                control={form.control}
+                name="imageProfile"
+                label="Foto de perfil"
+                renderSkeleton={(field) => (
+                  <FormControl>
+                    <FileUploader
+                      currentFile={user.image!!}
+                      files={field.value}
+                      onChange={field.onChange}
+                      imageProfile
+                    />
+                  </FormControl>
+                )}
+              />{" "}
+              <CustomFormField
+                fieldType={FormFieldType.SKELETON}
+                control={form.control}
+                name="gender"
+                label="Gênero"
+                renderSkeleton={(field) => (
+                  <FormControl>
+                    <RadioGroup
+                      className="flex h-11 gap-6 xl:justify-between"
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      {GenderOptions.map((option, i) => (
+                        <div key={option.value + i} className="radio-group">
+                          <RadioGroupItem value={option.value} id={option.value} />
+                          <Label htmlFor={option.value} className="cursor-pointer">
+                            {option.label}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                )}
+              />
+            </div>
           </div>
-
-          <div className="flex flex-col gap-6 xl:flex-row">
-            <CustomFormField
-              fieldType={FormFieldType.DATE_PICKER}
-              control={form.control}
-              name="birthDate"
-              label="Data de Nascimento"
-            />
-
-            <CustomFormField
-              fieldType={FormFieldType.SKELETON}
-              control={form.control}
-              name="gender"
-              label="Gênero"
-              renderSkeleton={(field) => (
-                <FormControl>
-                  <RadioGroup
-                    className="flex h-11 gap-6 xl:justify-between"
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    {GenderOptions.map((option, i) => (
-                      <div key={option.value + i} className="radio-group">
-                        <RadioGroupItem value={option.value} id={option.value} />
-                        <Label htmlFor={option.value} className="cursor-pointer">
-                          {option.label}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </FormControl>
-              )}
-            />
-          </div>
-
           <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
