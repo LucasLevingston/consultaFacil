@@ -5,7 +5,6 @@ import DoctorDetailsForm from "@/components/forms/DoctorDetails/DoctorDetailsFor
 import PatientDetailsForm from "@/components/forms/PatientDetails/PatientDetailsForm";
 import HeaderSection from "@/components/HeaderSection";
 import Loading from "@/components/loading";
-import LogoFull from "@/components/logo/LogoFull";
 import { ExtendUser } from "@/next-auth";
 
 const Register = async () => {

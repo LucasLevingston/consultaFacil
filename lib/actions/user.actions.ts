@@ -67,7 +67,7 @@ export const signInWithCreds = async (data: { email: string; password: string })
 
     if (!passwordMatch) throw new Error("Invalid credentials!");
 
-    const result = await signIn("credentials", {
+    await signIn("credentials", {
       email: data.email,
       password: data.password,
       redirect: false,

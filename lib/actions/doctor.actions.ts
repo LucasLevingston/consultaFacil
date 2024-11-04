@@ -1,7 +1,5 @@
 "use server";
 
-import { ID, InputFile } from "node-appwrite";
-
 import { prisma } from "@/lib/prisma";
 import { RegisterDoctorParams } from "@/types";
 
@@ -10,7 +8,6 @@ import {
   BUCKET_ID_IMAGE,
   ENDPOINT,
   PROJECT_ID,
-  storage,
 } from "../appwrite.config";
 
 import { createDocument } from "./bucket-actions/createDocument";

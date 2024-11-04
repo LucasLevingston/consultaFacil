@@ -2,25 +2,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FcGoogle } from "react-icons/fc";
 import { z } from "zod";
 
 import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import {
-  createUser,
-  signInWithCreds,
-  signInWithGoogle,
-} from "@/lib/actions/user.actions";
+import { createUser, signInWithCreds } from "@/lib/actions/user.actions";
 import { UserFormValidation, LoginFormValidation } from "@/lib/validation";
 
 import "react-phone-number-input/style.css";
 import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
-import { Button } from "../ui/button";
 import { SelectItem } from "../ui/select";
-
 
 export const UserForm = () => {
   const router = useRouter();
