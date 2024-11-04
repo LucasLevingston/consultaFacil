@@ -7,12 +7,21 @@ import { getDoctor } from "@/lib/actions/doctor.actions";
 import { formatDateTime } from "@/lib/utils";
 import { SearchParamProps } from "@/types";
 import LogoFull from "@/components/logo/LogoFull";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 const RequestSuccess = async ({ searchParams }: SearchParamProps) => {
   const appointmentId = (searchParams?.appointmentId as string) || "";
+  const session = await auth();
   const appointment = await getAppointment(appointmentId);
   if (!appointment) {
     return;
+  }
+  if (!session?.user?.isDone) {
+    redirect("/auth/completar-cadastro");
+  }
+  if (session?.user?.role === "doctor") {
+    redirect("/");
   }
   const doctor = await getDoctor(appointment?.doctorId);
 
@@ -49,6 +58,7 @@ const RequestSuccess = async ({ searchParams }: SearchParamProps) => {
               src="/assets/icons/calendar.svg"
               height={24}
               width={24}
+              unoptimized
               alt="calendário"
             />
             {appointment && <p> {formatDateTime(appointment.schedule).dateTime}</p>}
