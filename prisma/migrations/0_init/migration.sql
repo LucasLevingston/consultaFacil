@@ -1,21 +1,11 @@
-/*
-  Warnings:
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('patient', 'doctor', 'admin');
 
-  - You are about to drop the `Doctor` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Patient` table. If the table is not empty, all the data it contains will be lost.
+-- CreateEnum
+CREATE TYPE "Status" AS ENUM ('scheduled', 'pending', 'canceled', 'finalized');
 
-*/
--- DropForeignKey
-ALTER TABLE "Appointment" DROP CONSTRAINT "Appointment_doctorId_fkey";
-
--- DropForeignKey
-ALTER TABLE "Appointment" DROP CONSTRAINT "Appointment_patientId_fkey";
-
--- DropTable
-DROP TABLE "Doctor";
-
--- DropTable
-DROP TABLE "Patient";
+-- CreateEnum
+CREATE TYPE "Gender" AS ENUM ('male', 'female', 'other');
 
 -- CreateTable
 CREATE TABLE "accounts" (
@@ -51,9 +41,12 @@ CREATE TABLE "users" (
     "name" TEXT,
     "email" TEXT,
     "email_verified" TIMESTAMP(3),
+    "phone" TEXT,
+    "password" TEXT,
     "image" TEXT,
-    "isPatient" BOOLEAN NOT NULL DEFAULT false,
-    "isDoctor" BOOLEAN NOT NULL DEFAULT false,
+    "imageId" TEXT,
+    "isDone" BOOLEAN NOT NULL DEFAULT false,
+    "role" "Role" NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -67,22 +60,32 @@ CREATE TABLE "verification_tokens" (
 
 -- CreateTable
 CREATE TABLE "DoctorDetails" (
-    "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "specialty" TEXT,
+    "phone" TEXT,
+    "name" TEXT,
+    "email" TEXT,
     "licenseNumber" TEXT,
+    "privacyConsent" BOOLEAN,
+    "imageProfileUrl" TEXT,
+    "imageProfileId" TEXT,
+    "cpf" TEXT,
     "identificationDocumentId" TEXT,
+    "identificationDocumentType" TEXT,
     "identificationDocumentUrl" TEXT,
+    "birthDate" TIMESTAMP(3),
+    "gender" "Gender",
+    "address" TEXT,
 
-    CONSTRAINT "DoctorDetails_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "DoctorDetails_pkey" PRIMARY KEY ("userId")
 );
 
 -- CreateTable
 CREATE TABLE "PatientDetails" (
-    "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "phone" TEXT,
-    "privacyConsent" BOOLEAN,
+    "name" TEXT,
+    "email" TEXT,
     "gender" "Gender",
     "birthDate" TIMESTAMP(3),
     "address" TEXT,
@@ -93,10 +96,32 @@ CREATE TABLE "PatientDetails" (
     "currentMedication" TEXT,
     "familyMedicalHistory" TEXT,
     "pastMedicalHistory" TEXT,
+    "privacyConsent" BOOLEAN,
+    "treatmentConsent" BOOLEAN,
+    "disclosureConsent" BOOLEAN,
+    "cpf" TEXT,
+    "imageProfileUrl" TEXT,
+    "imageProfileId" TEXT,
     "identificationDocumentId" TEXT,
+    "identificationDocumentType" TEXT,
     "identificationDocumentUrl" TEXT,
 
-    CONSTRAINT "PatientDetails_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "PatientDetails_pkey" PRIMARY KEY ("userId")
+);
+
+-- CreateTable
+CREATE TABLE "Appointment" (
+    "id" TEXT NOT NULL,
+    "schedule" TIMESTAMP(3) NOT NULL,
+    "reason" TEXT,
+    "note" TEXT,
+    "status" "Status" NOT NULL DEFAULT 'scheduled',
+    "patientId" TEXT NOT NULL,
+    "doctorId" TEXT NOT NULL,
+    "cancellationReason" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Appointment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -111,12 +136,6 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "verification_tokens_identifier_token_key" ON "verification_tokens"("identifier", "token");
 
--- CreateIndex
-CREATE UNIQUE INDEX "DoctorDetails_userId_key" ON "DoctorDetails"("userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "PatientDetails_userId_key" ON "PatientDetails"("userId");
-
 -- AddForeignKey
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -127,10 +146,11 @@ ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_fkey" FOREIGN KEY ("user
 ALTER TABLE "DoctorDetails" ADD CONSTRAINT "DoctorDetails_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PatientDetails" ADD CONSTRAINT "PatientDetails_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PatientDetails" ADD CONSTRAINT "PatientDetails_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "PatientDetails"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "PatientDetails"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "DoctorDetails"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "DoctorDetails"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
