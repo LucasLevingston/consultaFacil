@@ -77,3 +77,13 @@ export interface AppointmentCount {
   finalizedCount: number;
   totalCount: number;
 }
+
+export interface Plan {
+  id: string;
+  name: string;
+  amount: number;
+  interval: string;
+  currency: string;
+  features: string[];
+  recurring: any;
+}

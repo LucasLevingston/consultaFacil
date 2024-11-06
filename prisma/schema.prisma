@@ -96,6 +96,7 @@ model DoctorDetails {
   birthDate DateTime?
   gender Gender?
   address                   String?
+  subscription String?
 
 
 

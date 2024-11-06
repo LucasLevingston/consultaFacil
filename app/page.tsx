@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 
 import { ContactSection } from "@/components/ContactSection";
 import { FeaturesSection } from "@/components/FeaturesSection";
-import { PlansSection } from "@/components/plans/PlansSection";
 import { Button } from "@/components/ui/button";
+import PlansSection from "@/components/plans/PlansSection";
 
 export default function Home() {
   const router = useRouter();
@@ -41,6 +41,7 @@ export default function Home() {
         </div>
       </section>
       <FeaturesSection />
+
       <PlansSection />
       <ContactSection />
     </div>

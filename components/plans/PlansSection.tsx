@@ -1,109 +1,91 @@
-import { Check } from "lucide-react";
+"use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { loadStripe } from "@stripe/stripe-js";
+import { getPlans } from "@/lib/actions/payment-actions/get-plans";
+import Stripe from "stripe";
+import { PlanCard } from "./PlanCard";
 
-export function PlansSection() {
-  return (
-    <section className="w-full bg-mainColor py-12 md:py-24 lg:py-32">
-      <div className="container px-4 md:px-6">
-        <h2 className="mb-8 text-center text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-          Planos para Médicos
-        </h2>
-        <p className="mb-8 text-center text-xl text-gray-500 dark:text-gray-200">
-          Escolha o plano ideal para sua prática médica e comece a atender pacientes
-          através do ConsultaFácil
-        </p>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Basic Plan */}
-          <Card className="dark:bg-dark-600">
-            <CardHeader>
-              <CardTitle className="text-center text-2xl font-bold">Básico</CardTitle>
-              <p className="text-center text-4xl font-bold">
-                R$99<span className="text-base font-normal">/mês</span>
-              </p>
-            </CardHeader>
-            <CardContent>
-              <ul className="mb-6 space-y-2">
-                <li className="flex items-center">
-                  <Check className="mr-2 size-5 text-green-500" />
-                  <span>Até 50 consultas/mês</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="mr-2 size-5 text-green-500" />
-                  <span>Perfil básico</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="mr-2 size-5 text-green-500" />
-                  <span>Suporte por email</span>
-                </li>
-              </ul>
-              <Button className="w-full">Escolher Plano</Button>
-            </CardContent>
-          </Card>
-          {/* Professional Plan */}
-          <Card className="border-primary dark:bg-dark-600">
-            <CardHeader>
-              <CardTitle className="text-center text-2xl font-bold">
-                Profissional
-              </CardTitle>
-              <p className="text-center text-4xl font-bold">
-                R$199<span className="text-base font-normal">/mês</span>
-              </p>
-            </CardHeader>
-            <CardContent>
-              <ul className="mb-6 space-y-2">
-                <li className="flex items-center">
-                  <Check className="mr-2 size-5 text-green-500" />
-                  <span>Consultas ilimitadas</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="mr-2 size-5 text-green-500" />
-                  <span>Perfil destacado</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="mr-2 size-5 text-green-500" />
-                  <span>Suporte prioritário</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="mr-2 size-5 text-green-500" />
-                  <span>Relatórios avançados</span>
-                </li>
-              </ul>
-              <Button className="w-full">Escolher Plano</Button>
-            </CardContent>
-          </Card>
-          {/* Clinic Plan */}
-          <Card className="dark:bg-dark-600">
-            <CardHeader>
-              <CardTitle className="text-center text-2xl font-bold">Clínica</CardTitle>
-              <p className="text-center text-4xl font-bold">
-                R$399<span className="text-base font-normal">/mês</span>
-              </p>
-            </CardHeader>
-            <CardContent>
-              <ul className="mb-6 space-y-2">
-                <li className="flex items-center">
-                  <Check className="mr-2 size-5 text-green-500" />
-                  <span>Múltiplos médicos</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="mr-2 size-5 text-green-500" />
-                  <span>Perfil de clínica</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="mr-2 size-5 text-green-500" />
-                  <span>Suporte 24/7</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="mr-2 size-5 text-green-500" />
-                  <span>Integração com sistemas</span>
-                </li>
-              </ul>
-              <Button className="w-full">Escolher Plano</Button>
-            </CardContent>
-          </Card>
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+
+export default function PlansSection() {
+  const [plans, setPlans] = useState<Stripe.Plan[]>([]);
+  const [loading, setLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const result = await getPlans();
+        setPlans(result.data);
+      } catch (error) {
+        console.error("Error fetching plans:", error);
+        setError("Falha ao carregar os planos. Por favor, tente novamente mais tarde.");
+      }
+    };
+
+    fetchPlans();
+  }, []);
+
+  const handleSubscription = async (planId: string) => {
+    setLoading(planId);
+
+    try {
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ planId }),
+      });
+
+      const session = await response.json();
+
+      const stripe = await stripePromise;
+      const { error } = await stripe!.redirectToCheckout({
+        sessionId: session.id,
+      });
+
+      if (error) {
+        console.error("Error:", error);
+        setError("Ocorreu um erro ao processar o pagamento. Por favor, tente novamente.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setError("Ocorreu um erro ao processar o pagamento. Por favor, tente novamente.");
+    }
+
+    setLoading(null);
+  };
+
+  if (error) {
+    return (
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
+        <div className="container px-4 md:px-6">
+          <h2 className="text-3xl font-bold text-center mb-6 text-red-600">{error}</h2>
         </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
+      <div className="container px-4 md:px-6">
+        <h2 className="text-3xl font-bold text-center mb-12">Nossos Planos</h2>
+        {plans.length === 0 ? (
+          <p className="text-center">Carregando planos...</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {plans.map((plan) => (
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                onSubscribe={handleSubscription}
+                isLoading={loading === plan.id}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

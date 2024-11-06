@@ -124,3 +124,9 @@ export const capitalizeFirstLetter = (text: string) => {
   if (!text) return "";
   return text.charAt(0).toUpperCase() + text.slice(1);
 };
+
+function convertToSubcurrency(amount: number, factor = 100) {
+  return Math.round(amount * factor);
+}
+
+export default convertToSubcurrency;

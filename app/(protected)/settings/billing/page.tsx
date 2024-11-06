@@ -1,3 +1,4 @@
+import BuyButton from "@/components/BuyButton";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,6 +30,7 @@ export default async function Page() {
               </span>
               <span className="text-muted-foreground text-sm">
                 {/* {plan.quota.TASKS.usage}% */}
+                <BuyButton />
               </span>
             </header>
             <main>{/* <Progress value={plan.quota.TASKS.usage} /> */}</main>

@@ -4,17 +4,17 @@ export const GenderOptions = [
   { label: "Outro", value: "other" },
 ];
 export const IdentificationTypes = [
-  "Birth Certificate",
-  "Driver's License",
-  "Medical Insurance Card/Policy",
-  "Military ID Card",
-  "National Identity Card",
-  "Passport",
-  "Resident Alien Card (Green Card)",
-  "Social Security Card",
-  "State ID Card",
-  "Student ID Card",
-  "Voter ID Card",
+  "Certidão de Nascimento",
+  "Carteira de Motorista",
+  "Cartão/Apólice de Seguro Médico",
+  "Carteira de Identidade Militar",
+  "Carteira de Identidade Nacional",
+  "Passaporte",
+  "Cartão de Residente Estrangeiro (Green Card)",
+  "Cartão de Seguridade Social",
+  "Carteira de Identidade Estadual",
+  "Carteira de Estudante",
+  "Carteira de Eleitor",
 ];
 
 export const StatusIcon = {
