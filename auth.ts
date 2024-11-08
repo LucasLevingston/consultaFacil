@@ -38,6 +38,7 @@ export const {
       return token;
     },
   },
+
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   ...authConfig,

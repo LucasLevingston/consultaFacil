@@ -1,3 +1,5 @@
+import { NavItem } from "@/types";
+
 export const GenderOptions = [
   { label: "Homem", value: "male" },
   { label: "Mulher", value: "female" },
@@ -56,4 +58,105 @@ export const specialties = [
   "Infectologia",
   "Genética Médica",
   "Cuidados Paliativos",
+];
+
+export const plans = [
+  {
+    title: "Grátis",
+    monthlyPrice: 0,
+    yearlyPrice: 0,
+    description: "Recursos essenciais para começar",
+    features: [
+      "Agendamento básico de consultas",
+      "Até 10 consultas por mês",
+      "Notificações por e-mail para usuários e profissionais",
+      "Relatórios simples de agendamentos",
+      "Suporte básico via e-mail",
+    ],
+    priceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_FREE_MONTHLY,
+    priceIdYearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_FREE_YEARLY,
+    actionLabel: "Comece Agora",
+  },
+  {
+    title: "Básico",
+    monthlyPrice: 50,
+    yearlyPrice: 500,
+    description: "Recursos adicionais para clínicas pequenas",
+    features: [
+      "Agendamento ilimitado de consultas",
+      "Notificações por SMS",
+      "Relatórios detalhados de agendamentos",
+      "Suporte prioritário via e-mail",
+    ],
+    priceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_BASIC_MONTHLY,
+    priceIdYearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_BASIC_YEARLY,
+    actionLabel: "Comece Agora",
+  },
+  {
+    title: "Pro",
+    monthlyPrice: 75,
+    yearlyPrice: 750,
+    description: "Perfeito para donos de pequenas e médias empresas",
+    features: [
+      "Agendamento ilimitado de consultas",
+      "Integração com calendários externos",
+      "Relatórios avançados e análise de dados",
+      "Suporte via chat 24/7",
+      "Customização de marca",
+    ],
+    actionLabel: "Comece Agora",
+    priceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_MONTHLY,
+    priceIdYearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_YEARLY,
+    popular: true,
+  },
+];
+
+export const navItems: NavItem[] = [
+  {
+    title: "Dashboard",
+    url: "/dashboard/overview",
+    icon: "dashboard",
+    isActive: false,
+    items: [], // Empty array as there are no child items for Dashboard
+  },
+  {
+    title: "Employee",
+    url: "/dashboard/employee",
+    icon: "user",
+    isActive: false,
+    items: [], // No child items
+  },
+  {
+    title: "Product",
+    url: "/dashboard/product",
+    icon: "product",
+    isActive: false,
+    items: [], // No child items
+  },
+  {
+    title: "Account",
+    url: "#", // Placeholder as there is no direct link for the parent
+    icon: "billing",
+    isActive: true,
+
+    items: [
+      {
+        title: "Profile",
+        url: "/dashboard/profile",
+        icon: "userPen",
+      },
+      {
+        title: "Login",
+        url: "/",
+        icon: "login",
+      },
+    ],
+  },
+  {
+    title: "Kanban",
+    url: "/dashboard/kanban",
+    icon: "kanban",
+    isActive: false,
+    items: [], // No child items
+  },
 ];

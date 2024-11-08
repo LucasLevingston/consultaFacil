@@ -1,92 +1,72 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
-import { getPlans } from "@/lib/actions/payment-actions/get-plans";
-import Stripe from "stripe";
+import { toast } from "@/hooks/use-toast";
 import { PlanCard } from "./PlanCard";
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+import { PlansHeader } from "./PlansHeader";
+import { PlansSwitch } from "./PlansSwitch";
+import { plans } from "@/constants";
+import { useSession } from "next-auth/react";
 
 export default function PlansSection() {
-  const [plans, setPlans] = useState<Stripe.Plan[]>([]);
-  const [loading, setLoading] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { data } = useSession();
+  const user = data?.user;
+  const [isYearly, setIsYearly] = useState<boolean>(false);
+  const togglePlansPeriod = (value: string) => setIsYearly(parseInt(value) === 1);
+  const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
 
   useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        const result = await getPlans();
-        setPlans(result.data);
-      } catch (error) {
-        console.error("Error fetching plans:", error);
-        setError("Falha ao carregar os planos. Por favor, tente novamente mais tarde.");
-      }
-    };
-
-    fetchPlans();
+    setStripePromise(loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!));
   }, []);
 
-  const handleSubscription = async (planId: string) => {
-    setLoading(planId);
-
+  const handleCheckout = async (priceId: string, subscription: boolean) => {
     try {
-      const response = await fetch("/api/create-checkout-session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ planId }),
+      const { data } = await axios.post(`/api/stripe/create-checkout-session`, {
+        userId: user?.id,
+        email: user?.email,
+        priceId,
+        subscription,
       });
 
-      const session = await response.json();
+      if (data.sessionId) {
+        const stripe = await stripePromise;
 
-      const stripe = await stripePromise;
-      const { error } = await stripe!.redirectToCheckout({
-        sessionId: session.id,
-      });
+        const response = await stripe?.redirectToCheckout({
+          sessionId: data.sessionId,
+        });
 
-      if (error) {
-        console.error("Error:", error);
-        setError("Ocorreu um erro ao processar o pagamento. Por favor, tente novamente.");
+        return response;
+      } else {
+        console.error("Failed to create checkout session");
+        toast({ title: "Failed to create checkout session" });
+        return;
       }
     } catch (error) {
-      console.error("Error:", error);
-      setError("Ocorreu um erro ao processar o pagamento. Por favor, tente novamente.");
+      console.error("Error during checkout:", error);
+      toast({ title: "Error during checkout" });
+      return;
     }
-
-    setLoading(null);
   };
 
-  if (error) {
-    return (
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
-        <div className="container px-4 md:px-6">
-          <h2 className="text-3xl font-bold text-center mb-6 text-red-600">{error}</h2>
-        </div>
-      </section>
-    );
-  }
-
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
-      <div className="container px-4 md:px-6">
-        <h2 className="text-3xl font-bold text-center mb-12">Nossos Planos</h2>
-        {plans.length === 0 ? (
-          <p className="text-center">Carregando planos...</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {plans.map((plan) => (
-              <PlanCard
-                key={plan.id}
-                plan={plan}
-                onSubscribe={handleSubscription}
-                isLoading={loading === plan.id}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
+    <div className="py-12 flex flex-col gap-4 md:py-24 lg:py-32 bg-mainColor">
+      <PlansHeader title="Planos" subtitle="Assine para começar a receber consultas!" />
+      <PlansSwitch onSwitch={togglePlansPeriod} />
+      <section className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-8 ">
+        {plans.map((plan) => {
+          return (
+            <PlanCard
+              key={plan.title}
+              user={user!}
+              handleCheckout={handleCheckout}
+              {...plan}
+              isYearly={isYearly}
+            />
+          );
+        })}
+      </section>
+    </div>
   );
 }

@@ -1,8 +1,31 @@
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import CustomFormField, { FormFieldType } from "@/components/CustomFormField";
+import { Form } from "./ui/form";
+import { useForm } from "react-hook-form";
+
+// Definindo o schema de validação com Zod
+const contactSchema = z.object({
+  name: z.string().min(5, "Digite o nome"),
+  email: z.string().email("Digite o email"),
+  message: z.string().min(1, "Digite a mensagem"),
+});
 
 export function ContactSection() {
+  const form = useForm<z.infer<typeof contactSchema>>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      message: "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof contactSchema>) {
+    console.log(values);
+  }
+
   return (
     <section className="w-full bg-gray-100 py-12 dark:bg-gray-800 md:py-24 lg:py-32">
       <div className="container px-4 md:px-6">
@@ -10,27 +33,35 @@ export function ContactSection() {
           Entre em Contato
         </h2>
         <div className="mx-auto max-w-md">
-          <form className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nome</Label>
-              <Input id="name" placeholder="Seu nome" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="seu@email.com" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="message">Mensagem</Label>
-              <textarea
-                id="message"
-                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring min-h-[100px] w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="Sua mensagem aqui"
+          <Form {...form}>
+            <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+              <CustomFormField
+                name="name"
+                control={form.control}
+                fieldType={FormFieldType.INPUT}
+                label="Nome"
+                placeholder="Digite seu nome"
               />
-            </div>
-            <Button type="submit" className="w-full">
-              Enviar Mensagem
-            </Button>
-          </form>
+              <CustomFormField
+                name="email"
+                control={form.control}
+                fieldType={FormFieldType.INPUT}
+                label="Email"
+                placeholder="Digite seu email"
+              />
+              <CustomFormField
+                name="message"
+                control={form.control}
+                fieldType={FormFieldType.TEXTAREA}
+                label="Mensagem"
+                placeholder="Digite sua mensagem"
+              />
+
+              <Button type="submit" className="w-full">
+                Enviar Mensagem
+              </Button>
+            </form>
+          </Form>
         </div>
       </div>
     </section>

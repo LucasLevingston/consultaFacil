@@ -43,6 +43,7 @@ export default function Home() {
       <FeaturesSection />
 
       <PlansSection />
+
       <ContactSection />
     </div>
   );

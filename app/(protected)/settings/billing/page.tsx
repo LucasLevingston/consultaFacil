@@ -1,46 +1,9 @@
-import BuyButton from "@/components/BuyButton";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import PlansSection from "@/components/plans/PlansSection";
 
 export default async function Page() {
-  // const plan = await getUserCurrentPlan(session?.user.id as string);
-
   return (
-    <form>
-      <Card>
-        <CardHeader className="border-border border-b">
-          <CardTitle>Uso do Plano</CardTitle>
-          <CardDescription>
-            Você está atualmente no{" "}
-            {/* <span className="font-bold uppercase">{plan.name}</span>. */}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <div className="space-y-2">
-            <header className="flex items-center justify-between">
-              <span className="text-muted-foreground text-sm">
-                {/* {plan.quota.TASKS.current}/{plan.quota.TASKS.available} */}
-              </span>
-              <span className="text-muted-foreground text-sm">
-                {/* {plan.quota.TASKS.usage}% */}
-                <BuyButton />
-              </span>
-            </header>
-            <main>{/* <Progress value={plan.quota.TASKS.usage} /> */}</main>
-          </div>
-        </CardContent>
-        <CardFooter className="border-border flex items-center justify-between border-t pt-6">
-          <span>Para um maior limite, assine o PRO</span>
-          <Button type="submit">Assine por R$89/ mês</Button>
-        </CardFooter>
-      </Card>
-    </form>
+    <div>
+      <PlansSection />
+    </div>
   );
 }
