@@ -25,6 +25,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
 } from "./ui/dropdown-menu";
+import ThemeToggle from "./layout/ThemeToggle/theme-toggle";
 
 export async function Header() {
   const session = await auth();
@@ -86,6 +87,7 @@ export async function Header() {
             /> */}
           </div>
         </form>
+        <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
@@ -96,8 +98,12 @@ export async function Header() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel className="flex items-center justify-between">
-              Opções
+            <DropdownMenuLabel className="flex items-center justify-between gap-3">
+              <div>
+                <h1 className="font-bold text-base">Opções</h1>
+                <p className="text-sm fornt-semibold">{session?.user.name}</p>
+                <p className="text-xs font-normal">{session?.user.email}</p>
+              </div>
               <span>{session?.user?.role === "doctor" ? <Stethoscope /> : <User />}</span>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />

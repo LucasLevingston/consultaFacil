@@ -99,3 +99,9 @@ export interface NavItem {
   isActive?: boolean;
   items?: NavItem[];
 }
+
+export interface Area {
+  name: string;
+  image: string;
+  icon: React.ElementType;
+}

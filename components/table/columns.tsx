@@ -126,7 +126,6 @@ export const columns: ColumnDef<CompleteAppointment>[] = [
             setLoading(false);
           }
         };
-        console.log(session?.user);
 
         fetchDoctors();
       }, []);

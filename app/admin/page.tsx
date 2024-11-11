@@ -10,7 +10,7 @@ const AppointmentsPage = async () => {
   const session = await auth();
 
   return (
-    <div className="flex h-screen max-h-screen">
+    <div className="flex">
       <section className="remove-scrollbar container">
         <HeaderSection
           label={

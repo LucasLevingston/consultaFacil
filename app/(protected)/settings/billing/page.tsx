@@ -1,9 +1,9 @@
-import PlansSection from "@/components/plans/PlansSection";
+import Plans from "@/components/plans/Plans";
 
 export default async function Page() {
   return (
     <div>
-      <PlansSection />
+      <Plans />
     </div>
   );
 }

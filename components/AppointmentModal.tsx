@@ -19,7 +19,7 @@ import { Appointment, DoctorDetails } from "@prisma/client";
 
 import { ExtendUser } from "@/next-auth";
 
-export const AppointmentModal = async ({
+export const AppointmentModal = ({
   appointment,
   type,
   user,

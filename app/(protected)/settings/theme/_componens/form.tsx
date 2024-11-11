@@ -7,7 +7,6 @@ import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
@@ -49,7 +48,7 @@ export function ThemeForm() {
   return (
     <Form {...form}>
       <form onSubmit={onSubmit} className="space-y-8">
-        <Card>
+        <div>
           <CardHeader>
             <CardTitle className="bg-[#000}">Tema</CardTitle>
             <CardDescription>Selecione o tema para o painel.</CardDescription>
@@ -72,7 +71,9 @@ export function ThemeForm() {
                           <RadioGroupItem value="light" className="hidden" />
                         </FormControl>
                         <div
-                          className={`border-muted hover:border-accent cursor-pointer items-center rounded-md border-[3px] p-1 ${field.value === "light" && "border-mainColor"}`}
+                          className={`border-muted hover:border-accent cursor-pointer items-center rounded-md border-[3px] p-1 ${
+                            field.value === "light" && "border-mainColor"
+                          }`}
                         >
                           {" "}
                           <div className="space-y-2 rounded-sm bg-[#ecedef] p-2">
@@ -101,7 +102,9 @@ export function ThemeForm() {
                           <RadioGroupItem value="dark" className="hidden" />
                         </FormControl>
                         <div
-                          className={`border-muted hover:border-accent cursor-pointer items-center rounded-md border-[3px] p-1 ${field.value === "dark" ? "border-mainColor" : ""}`}
+                          className={`border-muted hover:border-accent cursor-pointer items-center rounded-md border-[3px] p-1 ${
+                            field.value === "dark" ? "border-mainColor" : ""
+                          }`}
                         >
                           <div className="space-y-2 rounded-sm bg-slate-950 p-2">
                             <div className="space-y-2 rounded-md bg-slate-800 p-2 shadow-sm">
@@ -128,7 +131,7 @@ export function ThemeForm() {
               )}
             />
           </CardContent>
-        </Card>
+        </div>
 
         <SheetFooter className="mt-auto">
           <Button disabled={form.formState.isLoading} type="submit">

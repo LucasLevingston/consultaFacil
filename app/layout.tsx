@@ -34,11 +34,13 @@ export default function RootLayout({
       <html lang="en">
         <ThemeProvider attribute="class" defaultTheme="system">
           <body
-            className={cn("min-h-screen font-work-sans antialiased  ", fontSans.variable)}
+            className={cn(
+              "min-h-screen flex flex-col font-work-sans antialiased",
+              fontSans.variable
+            )}
           >
             <Header />
-            <div className="flex flex-col font-work-sans">{children}</div>
-            <Footer />
+            <main className="flex-grow">{children}</main> <Footer />
             <Toaster />
           </body>
         </ThemeProvider>

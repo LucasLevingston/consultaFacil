@@ -1,5 +1,3 @@
-import { NavItem } from "@/types";
-
 export const GenderOptions = [
   { label: "Homem", value: "male" },
   { label: "Mulher", value: "female" },
@@ -108,55 +106,5 @@ export const plans = [
     priceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_MONTHLY,
     priceIdYearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_YEARLY,
     popular: true,
-  },
-];
-
-export const navItems: NavItem[] = [
-  {
-    title: "Dashboard",
-    url: "/dashboard/overview",
-    icon: "dashboard",
-    isActive: false,
-    items: [], // Empty array as there are no child items for Dashboard
-  },
-  {
-    title: "Employee",
-    url: "/dashboard/employee",
-    icon: "user",
-    isActive: false,
-    items: [], // No child items
-  },
-  {
-    title: "Product",
-    url: "/dashboard/product",
-    icon: "product",
-    isActive: false,
-    items: [], // No child items
-  },
-  {
-    title: "Account",
-    url: "#", // Placeholder as there is no direct link for the parent
-    icon: "billing",
-    isActive: true,
-
-    items: [
-      {
-        title: "Profile",
-        url: "/dashboard/profile",
-        icon: "userPen",
-      },
-      {
-        title: "Login",
-        url: "/",
-        icon: "login",
-      },
-    ],
-  },
-  {
-    title: "Kanban",
-    url: "/dashboard/kanban",
-    icon: "kanban",
-    isActive: false,
-    items: [], // No child items
   },
 ];
