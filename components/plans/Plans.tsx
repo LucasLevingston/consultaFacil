@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { loadStripe } from "@stripe/stripe-js";
 import { useSession } from "next-auth/react";
 import axios from "axios";
+import MyPlan from "./MyPlan";
 
 export default function Plans() {
   const { data } = useSession();
@@ -65,6 +66,7 @@ export default function Plans() {
           );
         })}
       </section>
+      <MyPlan />
     </>
   );
 }
